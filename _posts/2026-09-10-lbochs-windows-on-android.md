@@ -59,7 +59,7 @@ Sound 部分可以配置声卡、DMA 定时器、动态定时器和启用扬声�
 
 ## 挂载镜像并启动
 
-重新进入后设置**镜像路径**，找到你从 QQ 群下载好的 Windows XP 镜像文件（如果在 QQ 里下载的，路径一般在 `Android/data/com.tencent.mobileqq/cache` 这类 QQ 下载目录里）。
+重新进入后设置**镜像路径**，找到你从 QQ 群下载好的 Windows XP 镜像文件（QQ 下载的文件一般在 `Android/data/com.tencent.mobileqq/cache` 这类目录里）。
 
 ![选择镜像路径](/assets/img/lbochs/07-image-path.jpg)
 
