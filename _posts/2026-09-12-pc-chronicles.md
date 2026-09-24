@@ -3,7 +3,7 @@ layout: post
 title: "我的电脑编年史：从 H61 到 AM4"
 date: 2026-09-12 00:00
 author: "磁贴"
-header-img: "img/post-bg-pc.jpg"
+header-img: "img/home-bg-geek.jpg"
 catalog: true
 tags:
     - 硬件

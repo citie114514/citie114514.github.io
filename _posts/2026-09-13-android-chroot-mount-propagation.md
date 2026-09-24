@@ -3,7 +3,7 @@ layout: post
 title: "从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查"
 date: 2026-09-13 00:00
 author: "磁贴"
-header-img: "img/post-bg-linux.jpg"
+header-img: "img/post-bg-unix-linux.jpg"
 catalog: true
 tags:
     - Android

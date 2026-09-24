@@ -3,7 +3,7 @@ layout: post
 title: "我做过很多没有做完的项目"
 date: 2026-09-12 00:30
 author: "磁贴"
-header-img: "img/post-bg-code.jpg"
+header-img: "img/post-bg-halting.jpg"
 catalog: true
 tags:
     - 编程
