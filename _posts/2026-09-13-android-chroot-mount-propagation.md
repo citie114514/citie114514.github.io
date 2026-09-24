@@ -32,7 +32,7 @@ tags:
 
 服务机并不是一台传统意义上的 Linux 服务器，而是一台 Android 手机。网络结构大致是：
 
-`	ext
+```text
 福建联通
    │
 中兴光猫
@@ -43,7 +43,7 @@ tags:
    │
 Android 手机
 192.168.31.78
-`
+```
 
 手机上通过 chroot 跑着 Ubuntu，里面有 OpenList、nginx、qBittorrent、OpenSSH、Tailscale、frpc、cloudflared 等服务。
 
@@ -69,9 +69,9 @@ Android 手机
 
 进一步登录手机检查后，我发现 sshd 最初只监听 IPv4：
 
-`	ext
+```text
 ListenAddress 0.0.0.0
-`
+```
 
 于是改成 IPv6 后继续测试。
 
@@ -79,10 +79,10 @@ ListenAddress 0.0.0.0
 
 最后采用双行：
 
-`	ext
+```text
 ListenAddress 0.0.0.0
 ListenAddress ::
-`
+```
 
 才实现真正的双栈监听。
 
@@ -128,7 +128,7 @@ ListenAddress ::
 
 OpenList 和 OpenSpeedTest 之类的 HTTP/HTTPS 服务通过 Cloudflare Tunnel 暴露：
 
-`	ext
+```text
 用户浏览器
     ↓
 Cloudflare
@@ -136,7 +136,7 @@ Cloudflare
 cloudflared
     ↓
 localhost:5244 / localhost:3000
-`
+```
 
 这样客户端不需要安装任何额外软件，浏览器直接访问域名即可。
 
@@ -146,7 +146,7 @@ SSH 是另外一种情况。
 
 Cloudflare Tunnel 对普通 TCP/SSH 客户端存在额外限制，如果要求外网直接使用标准 SSH 客户端，我最终还是选择了 OpenFRP：
 
-`	ext
+```text
 SSH Client
    ↓
 OpenFRP
@@ -154,7 +154,7 @@ OpenFRP
 frpc
    ↓
 sshd :22
-`
+```
 
 最后形成了一个很实用的组合：
 
@@ -185,7 +185,7 @@ Android 开机以后，容器并不会自己完整启动。
 
 核心结构大致变成：
 
-`	ext
+```text
 Android 开机
    ↓
 Magisk service.d
@@ -203,11 +203,11 @@ Magisk service.d
 启动 Tailscale
    ↓
 启动 cron
-`
+```
 
 OpenList 又比较特殊。
 
-它本身是 Android 原生应用，并不是 chroot 服务，所以只能通过 Android 的 m 来启动，而不是在 Ubuntu 里面直接启动。
+它本身是 Android 原生应用，并不是 chroot 服务，所以只能通过 Android 的 `am` 来启动，而不是在 Ubuntu 里面直接启动。
 
 慢慢地，这台手机开始真的像一台小型服务器了。
 
@@ -229,8 +229,7 @@ OpenList 又比较特殊。
 
 最终发现问题不是 sudo 本身，而是：
 
-> Android 的 /data 所在文件系统以 
-osuid 方式挂载。
+> Android 的 /data 所在文件系统以 `nosuid` 方式挂载。
 
 因此 /usr/bin/sudo 即便本身是 setuid，也无法正常利用 setuid 机制提权。
 
@@ -246,25 +245,25 @@ osuid 方式挂载。
 
 OpenCode 在容器里面运行时出现：
 
-`	ext
+```text
 Segmentation fault
 abort
-`
+```
 
 一开始看起来像是 Bun、JavaScriptCore 或者 ARM64 环境的问题。
 
 但继续深入后，发现一个非常诡异的事实：
 
-`	ext
+```text
 /proc/self/maps
 /proc/version
-`
+```
 
 这些本来应该一定存在的 /proc 内容，在容器里面竟然直接报：
 
-`	ext
+```text
 No such file or directory
-`
+```
 
 这意味着：
 
@@ -272,12 +271,12 @@ No such file or directory
 
 于是开始把宿主 Android 的：
 
-`	ext
+```text
 /dev
 /proc
 /sys
 /dev/pts
-`
+```
 
 bind 到 chroot 里面。
 
@@ -297,9 +296,9 @@ OpenCode 果然恢复。
 
 之前经常拿：
 
-`	ext
+```text
 :35930
-`
+```
 
 来判断 OpenList 是否正常。
 
@@ -315,12 +314,12 @@ OpenCode 果然恢复。
 
 后来改成真正的 HTTP 访问：
 
-`	ext
+```text
 localhost:5244 → HTTP 200
 localhost:3000 → HTTP 200
 localhost:8080 → HTTP 200
 localhost:8443 → HTTP 200
-`
+```
 
 这才算真正验证服务。
 
@@ -334,19 +333,19 @@ localhost:8443 → HTTP 200
 
 SSH 有时候能连上，但登录后马上断开。
 
-Android 的 m 命令偶发异常。
+Android 的 `am` 命令偶发异常。
 
 PTY 报：
 
-`	ext
+```text
 out of pty devices
-`
+```
 
 更严重的是：
 
-`	ext
+```text
 /dev/binder
-`
+```
 
 开始出现异常。
 
@@ -374,23 +373,23 @@ out of pty devices
 
 宿主的：
 
-`	ext
+```text
 /dev
 /proc
 /sys
 /dev/pts
-`
+```
 
 本身处于 shared propagation。
 
 例如：
 
-`	ext
+```text
 /dev       shared:2
 /dev/pts   shared:3
 /proc      shared:4
 /sys       shared:5
-`
+```
 
 问题就从这里开始。
 
@@ -400,12 +399,12 @@ out of pty devices
 
 表面上看，我执行的是很普通的操作：
 
-`sh
+```sh
 mount -o bind /dev "/dev"
 mount -o bind /proc "/proc"
 mount -o bind /sys "/sys"
 mount -o bind /dev/pts "/dev/pts"
-`
+```
 
 从字符串层面完全没问题。
 
@@ -421,7 +420,7 @@ mount -o bind /dev/pts "/dev/pts"
 
 于是：
 
-`	ext
+```text
 bind
   ↓
 产生 mount event
@@ -433,7 +432,7 @@ bind
 宿主对应路径产生新的 mount
   ↓
 覆盖原来的 mount
-`
+```
 
 然后灾难开始。
 
@@ -445,21 +444,21 @@ bind
 
 原本应该是：
 
-`	ext
+```text
 /dev      41
 /dev/pts  42
 /proc     43
 /sys      44
-`
+```
 
 后来开始出现：
 
-`	ext
+```text
 41
 104227
 67901
 ...
-`
+```
 
 其他路径也是类似情况。
 
@@ -473,15 +472,15 @@ bind
 
 Android 的 Binder 本来位于：
 
-`	ext
+```text
 /dev/binderfs
-`
+```
 
 PTY 则依赖：
 
-`	ext
+```text
 /dev/pts
-`
+```
 
 当这些目录被新的覆盖层遮掉以后，后果非常直接。
 
@@ -489,48 +488,48 @@ PTY 则依赖：
 
 原本：
 
-`	ext
+```text
 /dev/binder
 → /dev/binderfs/binder
-`
+```
 
 后来 Binderfs 被覆盖，/dev/binder 变成异常状态。
 
 结果：
 
-`	ext
+```text
 am
 ADB
 scrcpy
-`
+```
 
 都开始出现：
 
-`	ext
+```text
 Binder driver '/dev/binder' could not be opened
-`
+```
 
 ### PTY
 
 /dev/pts 被异常挂载覆盖之后：
 
-`	ext
+```text
 /dev/pts/ptmx
-`
+```
 
 消失。
 
 然后 sshd 虽然还能监听：
 
-`	ext
+```text
 :22
-`
+```
 
 但是给用户创建伪终端失败。
 
 于是出现一个非常迷惑的现象：
 
-`	ext
+```text
 SSH connection
     ↓
 能连上
@@ -538,7 +537,7 @@ SSH connection
 能看到 Ubuntu banner
     ↓
 突然 Connection closed
-`
+```
 
 实际上不是 SSH 密码，也不是 sshd 配置。
 
@@ -552,24 +551,24 @@ SSH connection
 
 事情已经够复杂了，结果继续查日志又发现：
 
-`	ext
+```text
 boot script start
 boot script start
-`
+```
 
 同一时间出现两次。
 
 后来发现 /data/adb/service.d 里居然放着一个：
 
-`	ext
+```text
 99-chroot-boot.sh.bak-propfix
-`
+```
 
 而且还是：
 
-`	ext
+```text
 0755
-`
+```
 
 也就是说，它不是普通备份。
 
@@ -581,7 +580,7 @@ Magisk 看到以后，自然把它也执行。
 
 于是：
 
-`	ext
+```text
 正式 boot 脚本
       +
 备份 boot 脚本
@@ -593,7 +592,7 @@ bind 两遍
 propagation 两遍
       ↓
 宿主 overlay 增长得更快
-`
+```
 
 这就解释了为什么问题会被放大得如此严重。
 
@@ -617,37 +616,37 @@ boot 脚本被可执行备份文件重复执行。
 
 Android 的 toybox：
 
-`	ext
+```text
 /system/bin/mount
-`
+```
 
 不支持我们需要的那种语法。
 
 而 BusyBox：
 
-`	ext
+```text
 /system/xbin/mount
-`
+```
 
 虽然支持 private，但：
 
-`sh
+```sh
 mount -o private /path
-`
+```
 
 会因为参数形式进入 fstab 解析，同样失败。
 
 最终实测下来，当前设备真正可用的是：
 
-`sh
+```sh
 /system/xbin/mount --make-private "/path"
-`
+```
 
 返回：
 
-`	ext
+```text
 rc=0
-`
+```
 
 并且 shared: 计数实际下降。
 
@@ -657,43 +656,43 @@ rc=0
 
 对于每个目标：
 
-`	ext
+```text
 /dev
 /proc
 /sys
 /dev/pts
-`
+```
 
 在 bind 前后做 private：
 
-`sh
+```sh
 /system/xbin/mount --make-private "/X" 2>/dev/null
 mount -o bind /宿主/X "/X"
 /system/xbin/mount --make-private "/X"
-`
+```
 
 也就是：
 
-`	ext
+```text
 bind 前：
 先把嫁接点设为 private
 
 bind：
 
 再把新 mount 设为 private
-`
+```
 
 同时把可执行的：
 
-`	ext
+```text
 99-chroot-boot.sh.bak-propfix
-`
+```
 
 移出：
 
-`	ext
+```text
 /data/adb/service.d
-`
+```
 
 ---
 
@@ -707,7 +706,7 @@ bind：
 
 所以最终方案不是简单地把一条失败命令换掉，而是形成：
 
-`	ext
+```text
 目标 mount
     ↓
 private
@@ -717,7 +716,7 @@ bind
 新 mount
     ↓
 private
-`
+```
 
 这样才能确保 mount event 不再继续向宿主传播。
 
@@ -731,39 +730,39 @@ private
 
 所以最后不是简单地看：
 
-`	ext
+```text
 rc=0
-`
+```
 
 而是直接重启。
 
 然后分别检查：
 
-`	ext
+```text
 boot + 1 min
 +120s
 +360s
-`
+```
 
 结果非常漂亮。
 
 修复前：
 
-`	ext
+```text
 /dev      41 → 104227 → 67901 → ...
 /proc     43 → 102553 → 49150 → ...
 /sys      44 → 103204 → 57972 → ...
 /dev/pts  42 → 大量 tmpfs
-`
+```
 
 修复后：
 
-`	ext
+```text
 /dev      41
 /dev/pts  42
 /proc     43
 /sys      44
-`
+```
 
 三次采样：
 
@@ -777,41 +776,41 @@ boot + 1 min
 
 恢复：
 
-`	ext
+```text
 binder
 binder-control
 hwbinder
 vndbinder
-`
+```
 
-m get-current-user：
+`am` get-current-user：
 
-`	ext
+```text
 0
-`
+```
 
 ### PTY
 
-：
+测试：
 
-`	ext
+```text
 pty.openpty()
 → PTY_OK
-`
+```
 
 不再出现：
 
-`	ext
+```text
 out of pty devices
-`
+```
 
 ### SSH
 
 最终真的建立：
 
-`	ext
+```text
 /dev/pts/0
-`
+```
 
 交互式 SSH 会话成功。
 
@@ -819,14 +818,14 @@ out of pty devices
 
 同时：
 
-`	ext
+```text
 nginx       → HTTP 200
 OpenList    → HTTP 200
 qBittorrent → HTTP 200
 Tailscale   → Online
 frpc        → 正常
 cloudflared → 正常
-`
+```
 
 至此，才真正可以说：
 
@@ -838,10 +837,10 @@ cloudflared → 正常
 
 稳定性审计过程中，又发现：
 
-`	ext
+```text
 frpc PID 7732
 frpc PID 9005
-`
+```
 
 第一反应很容易是：
 
@@ -849,13 +848,13 @@ frpc PID 9005
 
 结果只读检查后才发现：
 
-`	ext
+```text
 7732
 → SSH tunnel
 
 9005
 → OpenList tunnel
-`
+```
 
 它们：
 
@@ -865,11 +864,11 @@ frpc PID 9005
 * 日志不同
 * 各自只负责一个 tunnel
 
-而 rpc.sh 本身就明确写着：
+而 `frpc.sh` 本身就明确写着：
 
-`	ext
+```text
 INSTANCES="ssh openlist"
-`
+```
 
 所以这里的结论恰恰是：
 
@@ -885,7 +884,7 @@ INSTANCES="ssh openlist"
 
 整个系统大概变成这样：
 
-`	ext
+```text
                     Android
                        │
                ┌───────┴───────┐
@@ -911,11 +910,11 @@ INSTANCES="ssh openlist"
    │    └─ cloudflared
    │
    └── 外部 SSH
-`
+```
 
 而 mount 层则保持：
 
-`	ext
+```text
 宿主：
 /dev      41
 /dev/pts  42
@@ -927,7 +926,7 @@ chroot：
 /dev/pts  private
 /proc     private
 /sys      private
-`
+```
 
 没有继续产生覆盖层。
 
@@ -941,9 +940,9 @@ chroot：
 
 很多人看到：
 
-`	ext
+```text
 chroot
-`
+```
 
 就会下意识认为"容器里的 mount 不会影响外面"。
 
@@ -957,17 +956,17 @@ chroot
 
 单纯搜索：
 
-`	ext
+```text
 mount -o bind
-`
+```
 
 很难发现真正的问题。
 
 因为：
 
-`	ext
+```text
 mount -o bind /dev "/dev"
-`
+```
 
 从语法上完全正常。
 
@@ -989,18 +988,18 @@ mount -o bind /dev "/dev"
 
 所以：
 
-`	ext
+```text
 端口 UP ≠ OpenList 正常
-`
+```
 
 正确做法应该是：
 
-`	ext
+```text
 HTTP 200
 实际 API 响应
 真实 SSH 登录
 真实 PTY
-`
+```
 
 ---
 
@@ -1012,15 +1011,15 @@ HTTP 200
 
 一个：
 
-`	ext
+```text
 99-chroot-boot.sh.bak
-`
+```
 
 如果还带着：
 
-`	ext
+```text
 0755
-`
+```
 
 那它就不再是备份。
 
@@ -1057,7 +1056,7 @@ HTTP 200
 
 真正走到最后，却变成了：
 
-`	ext
+```text
 IPv6
  ↓
 光猫
@@ -1081,7 +1080,7 @@ devpts
 PTY
  ↓
 SSH
-`
+```
 
 最后真正解决问题的代码，甚至没有多少。
 
