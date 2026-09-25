@@ -4,7 +4,7 @@ title: "终末地手机端解锁极高画质：iUnlocker 模块实操记录"
 subtitle: "Root + Zygisk-Next，让非旗舰机也能开 1036P"
 date: 2026-09-10 21:20
 author: "磁贴"
-header-img: "img/post-bg-android.jpg"
+header-img: "img/post-bg-endfield.jpg"
 catalog: true
 tags:
     - 明日方舟终末地

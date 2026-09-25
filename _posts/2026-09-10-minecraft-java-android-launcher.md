@@ -2,6 +2,7 @@
 layout: post
 title: "手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程"
 date: 2026-09-10 12:00:00 +0800
+header-img: "img/post-bg-mc-java.jpg"
 categories: Minecraft 教程
 description: "教你如何在Android手机上通过PojavLauncher和HMCL-PE启动器运行Java版Minecraft"
 tags: [Minecraft, PojavLauncher, HMCL-PE, Android, Java版]

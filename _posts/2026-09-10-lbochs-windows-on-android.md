@@ -3,7 +3,7 @@ layout: post
 title: "用手机 lbochs 运行 Windows XP：安装与配置全过程"
 date: 2026-09-10 19:00
 author: "磁贴"
-header-img: "img/post-bg-android.jpg"
+header-img: "img/post-bg-lbochs.jpg"
 catalog: true
 tags:
     - lbochs

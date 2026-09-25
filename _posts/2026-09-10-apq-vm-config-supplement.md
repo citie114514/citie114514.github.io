@@ -2,6 +2,7 @@
 layout: post
 title: "APQ虚拟机配置补充教程：磁盘与CPU进阶设置"
 date: 2026-09-10 13:00:00 +0800
+header-img: "img/post-bg-apq-config.jpg"
 categories: APQ 教程
 description: "补充APQ虚拟机的磁盘挂载、CPU多线程等高级配置方法"
 tags: [APQ, 虚拟机, Android, QEMU, 教程]

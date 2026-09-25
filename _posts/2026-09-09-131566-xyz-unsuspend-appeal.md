@@ -4,7 +4,7 @@ title: "131566.xyz 解封申诉记录：从 serverHold 到恢复解析"
 subtitle: "一次域名被注册局挂起后的排查、清黑与沟通全过程"
 date: 2026-09-09 21:00
 author: "磁贴"
-header-img: "img/post-bg-digital-native.jpg"
+header-img: "img/post-bg-domain-appeal.jpg"
 catalog: true
 tags:
     - 域名

@@ -3,7 +3,7 @@ layout: post
 title: "手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接"
 date: 2026-09-10 20:00
 author: "磁贴"
-header-img: "img/post-bg-android.jpg"
+header-img: "img/post-bg-apq-win.jpg"
 catalog: true
 tags:
     - APQ
