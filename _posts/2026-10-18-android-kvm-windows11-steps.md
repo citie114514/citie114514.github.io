@@ -54,6 +54,12 @@ adb shell su -c 'dd if=/dev/block/by-name/preloader_raw_a bs=4096 2>/dev/null | 
 
 ## 跑一键脚本
 
+最省事的方式是下载发行版压缩包，里面工具都打包好了，不用 clone 任何东西：
+
+到 [Releases](https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest) 拿 `xaga-kvm-release-*.zip`，解压，双击 `一键开KVM.bat` 就行。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。
+
+想自己控制每一步的话，按下面的方式来：
+
 ```powershell
 git clone https://github.com/MT6895-Mainline/mtk-mod-tee-nogz  D:\mtk-mod-tee-nogz
 git clone https://github.com/kasnria001/pwnage24mtk           D:\pwnage24mtk
@@ -61,7 +67,8 @@ cd D:\mtk-mod-tee-nogz
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 
-cd <本仓库>\scripts
+git clone https://github.com/citie114514/xaga-windows-arm64-kvm  D:\xaga-kvm
+cd D:\xaga-kvm\scripts
 .\kvm-oneclick.ps1 -Profile xagapro `
   -TeeFixRepo D:\mtk-mod-tee-nogz `
   -PwnageDir D:\pwnage24mtk
@@ -127,7 +134,7 @@ mediatek,mt6895-vcodec-enc → mediatek,mt6895-vcodec-en0
 这个我写成脚本了：
 
 ```powershell
-cd <本仓库>\scripts
+cd D:\xaga-kvm\scripts
 .\flash-vendor-boot.ps1
 ```
 
