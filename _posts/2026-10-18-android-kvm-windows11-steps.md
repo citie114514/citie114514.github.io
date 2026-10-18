@@ -56,7 +56,7 @@ adb shell su -c 'dd if=/dev/block/by-name/preloader_raw_a bs=4096 2>/dev/null | 
 
 最省事的方式是下载发行版压缩包，里面工具都打包好了，不用 clone 任何东西：
 
-到 [Releases](https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest) 拿 `xaga-kvm-release-*.zip`，解压，双击 `start-kvm.bat` 就行（启动时先问你要中文还是英文/日文/俄文）。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。
+到 [Releases](https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest) 拿 `xaga-kvm-release-*.zip`，解压，双击 `start-kvm.bat` 就行。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。
 
 想自己控制每一步的话，按下面的方式来：
 
