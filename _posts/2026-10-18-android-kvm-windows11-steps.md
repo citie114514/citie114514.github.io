@@ -62,7 +62,9 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 
 cd <本仓库>\scripts
-.\kvm-oneclick.ps1 -Profile xagapro -TeeFixRepo D:\mtk-mod-tee-nogz -PwnageDir D:\pwnage24mtk
+.\kvm-oneclick.ps1 -Profile xagapro `
+  -TeeFixRepo D:\mtk-mod-tee-nogz `
+  -PwnageDir D:\pwnage24mtk
 ```
 
 `-Profile` 必须是 `xagapro`，不是可选项。上游那个 `xaga` profile 对应的是另一批固件（`bd4b13a7`），拿它去配你的 `f8f286f1`，脚本第一步哈希校验就过不去，直接中止。这是设计如此，不是 bug。
