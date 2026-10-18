@@ -4,6 +4,7 @@ title: "给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的�
 date: 2026-10-18 18:00
 author: "磁贴"
 header-img: "img/post-bg-kvm-xaga.jpg"
+header-pos-mobile: "left center"
 catalog: true
 tags:
     - Android
