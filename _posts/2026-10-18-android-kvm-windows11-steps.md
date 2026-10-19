@@ -32,7 +32,9 @@ adb shell su -c 'dd if=/dev/block/by-name/tee_b bs=4096 2>/dev/null | sha256sum'
 
 ## 需要的东西
 
-解锁的 Bootloader、能用的 root（KernelSU 或 Magisk）、PC 上的 adb 和 Python 3.10 以上。
+解锁的 Bootloader、能用的 root（KernelSU 或 Magisk）、PC 上的 Python 3.10 以上，还有 adb。
+
+adb 这个坑得单独说。脚本要在 PATH 里找它，很多人电脑上没装，或者装了没加进 PATH，第一步就报找不到设备。所以我在发行版里塞了一份 platform-tools：优先用系统那份，系统没有就用包里的。你要是想自己装 adb，记得把 platform-tools 目录加进环境变量 PATH。
 
 没有 root 就别往下看了。市面上那种"免 root 跑虚拟机"的方案走的是 TCG，纯软件模拟，慢十几倍到几十倍，装个系统要几小时。这个项目只做 KVM 路线。
 
@@ -56,7 +58,7 @@ adb shell su -c 'dd if=/dev/block/by-name/preloader_raw_a bs=4096 2>/dev/null | 
 
 最省事的方式是下载发行版压缩包，里面工具都打包好了，不用 clone 任何东西：
 
-到 [Releases](https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest) 拿 `xaga-kvm-release-*.zip`，解压，双击 `start-kvm.bat` 就行。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。
+到 [Releases](https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest) 拿 `xaga-kvm-release-*.zip`，解压，双击 `start-kvm.bat` 就行。adb 也打包在里面，电脑上不用先装任何东西。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。
 
 想自己控制每一步的话，按下面的方式来：
 
