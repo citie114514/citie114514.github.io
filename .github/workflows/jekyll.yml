@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -35,17 +33,16 @@ jobs:
       - name: Build site
         run: bundle exec jekyll build
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      # 直接发布到 site 分支，由 Pages 以 legacy 模式提供。
+      # 不走 upload-pages-artifact / deploy-pages：这两个 action 声明 Node 20，
+      # 被强制跑在 Node 24 上后产物名解析偶发失败
+      # （Error: No artifacts named "github-pages" were found）。
+      - name: Deploy to site branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ./_site
-          name: github-pages
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: github-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: site
+          cname: 131566.xyz
+          force_orphan: false
+          commit_message: "deploy: ${{ github.event.head_commit.message }}"
