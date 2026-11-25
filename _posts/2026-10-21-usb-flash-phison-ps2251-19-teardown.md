@@ -3,7 +3,7 @@ layout: post
 title: "一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控"
 date: 2026-10-21 23:30
 author: "磁贴"
-header-img: "img/post-bg-halting.jpg"
+header-img: "img/post-bg-usb-phison.jpg"
 header-pos-mobile: "center center"
 catalog: true
 tags:
