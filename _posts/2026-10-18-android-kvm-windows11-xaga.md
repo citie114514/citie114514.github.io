@@ -35,13 +35,7 @@ ARM 有 EL0 到 EL3 四层权限，Linux 内核跑在 EL1，KVM 要求它把 hyp
 
 动它之前先确认了两件事。
 
-一是 Secure Boot 到底开没开。preloader 会把自己的判定结果写进 `expdb` 分区，把那个分区拖出来 grep 一下：
-
-```bash
-adb shell su -c 'dd if=/dev/block/by-name/expdb of=/data/local/tmp/expdb.img bs=1M'
-adb pull /data/local/tmp/expdb.img
-grep -a -o "sbc_en = [01]" expdb.img | sort | uniq -c
-```
+一是 Secure Boot 到底开没开。preloader 会把自己的判定结果写进 `expdb` 分区，把那个分区拖出来 grep 一下 `sbc_en = [01]` 就知道。
 
 结果是 440 条 `sbc_en = 1`。这个值来自 eFuse，一次性烧写，改不了。意思是每次开机都会对 ATF 做证书链校验，改过的固件没有合法签名就过不去。
 
@@ -110,18 +104,9 @@ Windows 11 ARM64 能进桌面，能上网，能跑 CPU-Z，单核 247 多核 709
 
 至于应用检测，跟刷不刷 tee 没什么关系。补丁只改了 EL2 归谁，没碰 TEE。KeyMint 硬件密钥、Gatekeeper、Widevine、指纹、安全元件，实测刷前刷后逐项一致。BL 解锁本来就是 Play Integrity 过不去的原因，那是另一码事。
 
-## 几个命令，留给想动手的人
+## 留给想动手的人
 
-```bash
-# 补丁前先看自己是什么固件批次
-adb shell su -c 'dd if=/dev/block/by-name/tee_a bs=4096 2>/dev/null | sha256sum'
-adb shell su -c 'dd if=/dev/block/by-name/tee_b bs=4096 2>/dev/null | sha256sum'
-
-# 刷回原厂（系统还能起来的时候用 dd，起不来就进 fastboot）
-adb push tee_a_backup.img /data/local/tmp/tee_stock.img
-adb shell su -c 'dd if=/data/local/tmp/tee_stock.img of=/dev/block/by-name/tee_a bs=4096 && sync'
-adb reboot
-```
+动手前先比对自己 `tee_a`、`tee_b` 分区头若干字节的 SHA-256，看固件批次对不对得上。刷回原厂就是把手里的备份写回 `tee_a`、`sync` 完再重启；系统还能起来的时候在 shell 里做，起不来才要进 fastboot。具体命令不贴了，`dd` 和 `sha256sum` 都躺在手机的 busybox 里，偏移量、块大小自己按分区对一下就出来了。
 
 `tee_b` 从来没被动过，切到 B 槽就是没打补丁的状态。这是天然的后备。
 
