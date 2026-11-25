@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="一块 Kingston DataTraveler 3.0，128GB，用了两年多。某天插在机器上正读写着，断电了。再插回去，磁盘管理里显示”无媒体”，容量 0，盘符消失。
+">
+    
+    <meta property="article:published_time" content=" 2026-10-21T23:30:00Z">
+    
+    
+    <meta property="article:author" content="磁贴">
+    
+    
+    <meta property="article:tag" content="U盘">
+    
+    <meta property="article:tag" content="量产">
+    
+    <meta property="article:tag" content="PS2251-19">
+    
+    <meta property="article:tag" content="群联">
+    
+    <meta property="article:tag" content="Kingston">
+    
+    <meta property="article:tag" content="WebDAV">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/2026/10/21/usb-flash-phison-ps2251-19-teardown/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/2026/10/21/usb-flash-phison-ps2251-19-teardown/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-usb-phison.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-usb-phison.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: center center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=U%E7%9B%98" title="U盘">U盘</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E9%87%8F%E4%BA%A7" title="量产">量产</a>
+                        
+                        <a class="tag" href="/archive/?tag=PS2251-19" title="PS2251-19">PS2251-19</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E7%BE%A4%E8%81%94" title="群联">群联</a>
+                        
+                        <a class="tag" href="/archive/?tag=Kingston" title="Kingston">Kingston</a>
+                        
+                        <a class="tag" href="/archive/?tag=WebDAV" title="WebDAV">WebDAV</a>
+                        
+                    </div>
+                    <h1>一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by 磁贴 on October 21, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>一块 Kingston DataTraveler 3.0，128GB，用了两年多。某天插在机器上正读写着，断电了。再插回去，磁盘管理里显示”无媒体”，容量 0，盘符消失。</p>
+
+<p>这种症状一般是主控进了保护态或者 MP 参数区出了问题。手上有个 <code class="language-plaintext highlighter-rouge">Formatter_SiliconPower.exe</code>（群联 PreFormat 的换皮版），跑了一遍，盘回来了：123,749,337,600 字节，exFAT，读写正常。</p>
+
+<p>但是名字变了。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>设备描述: USB 大容量存储设备(silicon-power USB Device)
+USB设备ID: VID = 13FE PID = 0100
+设备供应商: (空)
+设备名称: silicon-power
+产品修订版: PMAP
+主控型号: PS2251-19(PS2319) - F/W 10.04.5D [2021-09-29]
+闪存识别码: 983E980376E4 - KIOXIA(铠侠) [TLC]
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">13FE</code> 是群联自己的 VID，<code class="language-plaintext highlighter-rouge">0100</code> 是它的默认 PID。那个 SP 工具不只是格式化了盘，还把整个描述符区写成了群联出厂默认值，顺手换了个序列号。</p>
+
+<p>从注册表的历史记录里翻到了它原来的样子：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>VID_0951&amp;PID_1666  -&gt;  Ven_Kingston  Prod_DataTraveler_3.0  Rev_PMAP
+序列号 408D5C15CB50E731B909061F
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">0951:1666</code> 才是 Kingston 的 ID。想改回去，得写主控的 MP 参数区，这不是改注册表能解决的。</p>
+
+<h2 id="第一次尝试用错了年份的工具">第一次尝试：用错了年份的工具</h2>
+
+<p>查到群联有个叫 Info updater 的轻量工具，专门改 VID/PID/厂商/产品名，不用量产，不丢数据。听起来正好。</p>
+
+<p>问题在于版本。这个工具最后一版是 2016 年的，而盘里的固件是 2021-09-29 的，差了五年。厂商命令的协议早就不一样了。</p>
+
+<p>填好 <code class="language-plaintext highlighter-rouge">0951</code> / <code class="language-plaintext highlighter-rouge">1666</code> / <code class="language-plaintext highlighter-rouge">Kingston</code> / <code class="language-plaintext highlighter-rouge">DataTraveler 3.0</code>，点”取得信息”，界面上的设备槽显示：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>驱动: E  0 MB
+60 14
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>容量读成 0，还带个错误码。这是明显的通信失败信号，但我还是点了”开始”。写命令发过去，主控直接不干了，盘变成”无媒体”。</p>
+
+<p>拔下来等了十几秒，插回去，自己好了。容量、文件系统、描述符全都回到点之前的状态。主控只是进了保护态，参数区一个字节都没被写坏。</p>
+
+<p>这条经验后面很有用：<strong>PS2251-19 被打进无媒体状态时，先试断电重插，很多时候它自己会回来。</strong></p>
+
+<h2 id="第二次尝试换同代工具">第二次尝试：换同代工具</h2>
+
+<p>2016 年的工具不行，那就找 2021 年的。<code class="language-plaintext highlighter-rouge">STTool V3.81.12 SZ 2021.06.18</code>，比固件早三个月，明确写着支持 PS2251-19 / PS2319。</p>
+
+<p>下载包 5.8MB，MD5 <code class="language-plaintext highlighter-rouge">5F93E734F975D869ADE2F470A595095F</code>。解压后 112 个文件，结构是标准的：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>STTOOL_F1_90_v200_00_SZ.exe          主程序
+MPParamEdit_F1_90.exe                参数编辑器
+ST.ini                               配置
+MPAll.dll                            量产核心
+BIN_FW/b2319_bank.bin                PS2319 主控固件
+ISP_INFO/2319_TLC_TSB_20210615.BIN   铠侠 TLC 颗粒固件
+FlashInfo.csv                        闪存型号库
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>固件是对得上的。<code class="language-plaintext highlighter-rouge">ST_ISP.ini</code> 里 TSB 3D TLC 那几行明确映射到 <code class="language-plaintext highlighter-rouge">2319_TLC_TSB_20210615.BIN</code>，而我的闪存 ID <code class="language-plaintext highlighter-rouge">983E980376E4</code> 在 <code class="language-plaintext highlighter-rouge">FlashInfo.csv</code> 里能匹配到 <code class="language-plaintext highlighter-rouge">***KIOXIA-BiCS5</code>（CSV 里第 6 字节是 <code class="language-plaintext highlighter-rouge">0x64</code>，工具读到 <code class="language-plaintext highlighter-rouge">0xE4</code>，差 <code class="language-plaintext highlighter-rouge">0x80</code> 是 Toggle 标志位，掩码后同一个颗粒）。</p>
+
+<h3 id="工具来源">工具来源</h3>
+
+<p>这个包我拿到的地方：</p>
+
+<ul>
+  <li>数码之家，<code class="language-plaintext highlighter-rouge">群联PS2251-19量产工具 v3.81.12-2021.06.18</code>
+<a href="https://www.mydigit.cn/thread-463362-1-1.html">https://www.mydigit.cn/thread-463362-1-1.html</a></li>
+  <li>flashboot.ru 同名文件（原始描述写着 for HG2309/HG2319）
+<a href="https://flashboot.ru/files/697">https://flashboot.ru/files/697</a></li>
+  <li>usbdev.ru 的 ST-TOOL 归档页
+<a href="https://www.usbdev.ru/files/phison/sttool/">https://www.usbdev.ru/files/phison/sttool/</a></li>
+</ul>
+
+<p>注意这个包是社区改版（文件名带 <code class="language-plaintext highlighter-rouge">_MOD</code>），不是群联官方发布。量产工具这类东西从非官方渠道拿，建议先比对 MD5 再用。</p>
+
+<h3 id="配置界面">配置界面</h3>
+
+<p>实际动手时基本都在 GUI 里操作，需要动的就两个页面。</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">IC_FW</code> 页</strong>：产品类型选 <code class="language-plaintext highlighter-rouge">USB 3.0</code>，主控选 <code class="language-plaintext highlighter-rouge">2251-19U3</code>，<code class="language-plaintext highlighter-rouge">烧入固件</code> 保持不勾选。下拉框里的型号写法是 <code class="language-plaintext highlighter-rouge">2251-19U3</code> / <code class="language-plaintext highlighter-rouge">2251-19U2</code>，不是 <code class="language-plaintext highlighter-rouge">PS2251-19</code>，手写 ini 时容易在这里写错。</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Drive Info</code> 页</strong>：填 VID <code class="language-plaintext highlighter-rouge">0951</code>、PID <code class="language-plaintext highlighter-rouge">1666</code>、制造商 <code class="language-plaintext highlighter-rouge">Kingston</code>、产品 <code class="language-plaintext highlighter-rouge">DataTraveler 3.0</code>、版本 <code class="language-plaintext highlighter-rouge">PMAP</code>。序列号那块勾 <code class="language-plaintext highlighter-rouge">Enable USB SN</code>，选 <code class="language-plaintext highlighter-rouge">Fixed SN Format</code>，<strong>先把旁边的 <code class="language-plaintext highlighter-rouge">Digit</code> 下拉框改成 24 再填值</strong>，否则 24 位会被按 12 位截断。</p>
+
+<p>另外有一点容易误判：点主界面的 <code class="language-plaintext highlighter-rouge">设定</code> 后，主窗口标题会变成 <code class="language-plaintext highlighter-rouge">(Not Responding)</code>，任务管理器里也是未响应。这是正常的——<code class="language-plaintext highlighter-rouge">设定</code> 会调起 <code class="language-plaintext highlighter-rouge">MPParamEdit</code> 并模态等待，主线程在等它关闭。在编辑器里保存或取消，主窗口就恢复了。</p>
+
+<p>还有一个顺序问题：编辑器保存时会按当前主控型号重新加载默认模板，把之前填的描述符覆盖回 <code class="language-plaintext highlighter-rouge">0x13FE</code> / <code class="language-plaintext highlighter-rouge">0x3E00</code> / <code class="language-plaintext highlighter-rouge">USB DISK 3.0</code>。所以要么一次把所有页面填完再保存，要么保存完再核对一遍 <code class="language-plaintext highlighter-rouge">Customize Info</code> 段。</p>
+
+<h3 id="最终配置">最终配置</h3>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="rouge-code"><pre><span class="nn">[PenDriveMP]</span><span class="w">
+</span><span class="na">IC</span><span class="w"> </span><span class="py">Type</span><span class="p">=</span><span class="s">2251-19U3</span>
+<span class="w">
+</span><span class="nn">[Customize Info]</span><span class="w">
+</span><span class="na">USB</span><span class="w"> </span><span class="py">VID</span><span class="p">=</span><span class="s">0x0951</span>
+<span class="na">USB</span><span class="w"> </span><span class="py">PID</span><span class="p">=</span><span class="s">0x1666</span>
+<span class="na">String</span><span class="w"> </span><span class="na">Product</span><span class="w"> </span><span class="py">Name</span><span class="p">=</span><span class="s">DataTraveler 3.0</span>
+<span class="na">String</span><span class="w"> </span><span class="na">Manufacturer</span><span class="w"> </span><span class="py">Name</span><span class="p">=</span><span class="s">Kingston</span>
+<span class="na">Inquiry</span><span class="w"> </span><span class="py">Version</span><span class="p">=</span><span class="s">PMAP</span>
+<span class="py">FWType</span><span class="p">=</span><span class="s">0</span>
+<span class="py">SNType</span><span class="p">=</span><span class="s">3</span>
+<span class="py">SNDigit</span><span class="p">=</span><span class="s">24</span>
+<span class="py">CustomerSerialNumber</span><span class="p">=</span><span class="s">408D5C15CB50E731B909061F</span>
+<span class="w">
+</span><span class="nn">[Firmware]</span><span class="w">
+</span><span class="py">ISP</span><span class="p">=</span><span class="s">0                 &lt;- 不烧固件，只写参数区</span>
+<span class="w">
+</span><span class="nn">[Sorting]</span><span class="w">
+</span><span class="py">DoSorting</span><span class="p">=</span><span class="s">0</span>
+<span class="py">DoMPALL</span><span class="p">=</span><span class="s">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这套配置本身没有问题，VID/PID、厂商、产品名、修订版、24 位序列号都对得上，固件也没动。</p>
+
+<h2 id="按下开始之后">按下开始之后</h2>
+
+<p>设备识别出来了，槽位显示 <code class="language-plaintext highlighter-rouge">1(E:)</code>，红框里是 <code class="language-plaintext highlighter-rouge">ID_03 [98 3E 98 03 76 E4 8]</code>，闪存 ID 正确。<code class="language-plaintext highlighter-rouge">开始</code> 按钮可用。</p>
+
+<p>点下去，界面有反应：<code class="language-plaintext highlighter-rouge">开始</code> 和 <code class="language-plaintext highlighter-rouge">停止</code> 都变灰，右上角计时停在 <code class="language-plaintext highlighter-rouge">T:0's</code>，红框颜色也褪了。</p>
+
+<p>但盘没有任何变化。型号还是 <code class="language-plaintext highlighter-rouge">silicon-power</code>，VID 还是 <code class="language-plaintext highlighter-rouge">13FE:0100</code>，序列号还是 <code class="language-plaintext highlighter-rouge">19AA9472E96E</code>。查进程的 I/O 计数，从启动到那一刻累计只写了 21,817 字节，就是保存 ST.ini 的大小，从来没往闪存写过东西。</p>
+
+<p>勾上 <code class="language-plaintext highlighter-rouge">自动量产</code> 再点 <code class="language-plaintext highlighter-rouge">更新</code>，<code class="language-plaintext highlighter-rouge">更新</code> 反而变成禁用，还是什么都没发生。没有任何错误弹窗，也没有日志文件。</p>
+
+<h2 id="这个包是干什么的">这个包是干什么的</h2>
+
+<p><code class="language-plaintext highlighter-rouge">STTOOL_V381_12_SZ_20210618_MOD</code> 这个名字在 flashboot 上的原始描述是 <strong>“for HG2309/HG2319 HLF UDP”</strong>，主要是给宏芯宇 HG2319（群联授权版）做分选和测试的。</p>
+
+<p><code class="language-plaintext highlighter-rouge">MPAll.dll</code> 里有 <code class="language-plaintext highlighter-rouge">C2319Controller</code>、<code class="language-plaintext highlighter-rouge">C2319NController</code> 这些类，说明它确实认识这个主控。但它缺完整的量产路径，所以 <code class="language-plaintext highlighter-rouge">开始</code> 按钮只是把界面状态改了一下，实际的 MP 流程没起来。</p>
+
+<p>数码之家上对这个主控的原话是”2251-19 别折腾”。我一开始以为这是别人没找到方法，现在看，更可能是一批人试过了。</p>
+
+<h2 id="结果">结果</h2>
+
+<p>型号没改回来。序列号也没能写回原厂值，虽然 ST.ini 里配置是对的，但量产没执行，等于没写。</p>
+
+<p>盘本身没事：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>项目</th>
+      <th>结果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>容量</td>
+      <td>123,749,337,600 字节，115.25 GiB</td>
+    </tr>
+    <tr>
+      <td>读速</td>
+      <td>77–91 MB/s</td>
+    </tr>
+    <tr>
+      <td>写速</td>
+      <td>34–51 MB/s</td>
+    </tr>
+    <tr>
+      <td>状态</td>
+      <td>exFAT / GPT / Healthy</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>从断电卡死到这一晚上结束，它经历了 SP 工具 PreFormat、Info updater 打挂、两次 STTool 尝试、h2testw 写了 30GB，一次都没真坏。</p>
+
+<h2 id="后半场把数据搬回-u-盘">后半场：把数据搬回 U 盘</h2>
+
+<p>既然盘还是好的，那就当普通盘用，把数据放回去。</p>
+
+<p>数据源是 NAS 上的 OpenList（端口 5244，WebDAV 接口），里面有个 <code class="language-plaintext highlighter-rouge">内部存储</code> 目录，按类别分好了：<code class="language-plaintext highlighter-rouge">01_实用工具</code>、<code class="language-plaintext highlighter-rouge">03_手机刷机</code>、<code class="language-plaintext highlighter-rouge">04_网络代理</code>、<code class="language-plaintext highlighter-rouge">05_字体字库</code> 一直到 <code class="language-plaintext highlighter-rouge">12_上传下载</code>，还有 <code class="language-plaintext highlighter-rouge">配置备份</code>。总共 7,377 个文件、27.94 GB，大部分是可再下载的软件安装包。</p>
+
+<p>顺带也把 <code class="language-plaintext highlighter-rouge">内部存储</code> 往 <code class="language-plaintext highlighter-rouge">移动云盘/磁贴</code> 补了一遍。WebDAV 的 <code class="language-plaintext highlighter-rouge">COPY</code> 方法在这里特别好用，服务端直接复制，不经过本地：1.91 GB 的 USBOS 用了 15 秒，约 130 MB/s。25 个小项也是秒过。</p>
+
+<p>只有一个 7.2 GB 的 <code class="language-plaintext highlighter-rouge">字库备份_黑鲨3.7z</code> 上不去。试了三条路：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方式</th>
+      <th>结果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>服务端 COPY</td>
+      <td>HTTP 500，45 秒，0 字节</td>
+    </tr>
+    <tr>
+      <td>管道直传</td>
+      <td>405 Method Not Allowed</td>
+    </tr>
+    <tr>
+      <td>落盘后带 Content-Length 上传</td>
+      <td>7.2G 传到 60 秒断；3GB 探针 560 秒超时；200MB 成功</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>200MB 能传、3GB 不行，说明是云盘侧的单文件体积限制，WebDAV 层改不了。放弃。</p>
+
+<p>U 盘那边顺利得多。先做差集：源 7,377 个文件，U 盘已有 6,926 个，缺 450 项 4.12 GB。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>(根目录)        2 项   1.93G
+03_手机刷机    439 项    602M
+06_桌面美化      1 项     45K
+07_游戏          8 项   1.60G
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>450 项全部传完，0 失败。因为文件大小从几百字节到 1.9GB 都有，速度波动很大，小文件单个 0.1 秒，USBOS 那种走满带宽。</p>
+
+<p>传完做全量审计：源和 U 盘同名文件 7,376 个，<strong>大小不一致 0 项</strong>。U 盘上多出 230 个文件，是我自己放的 Ventoy 主题和配置，没动。</p>
+
+<p>只有一个例外：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>07_游戏/PC游戏/Metro 2033 Redux V 0.1.0.0 PLus 7 Trainer 64.EXE
+源:   13,476,352 字节  sha256 ea1a2016...
+本地: 13,476,352 字节  sha256 fca0bab7...
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>字节数完全一样，哈希不同。这是之前就放在 U 盘里的同名文件，和 NAS 上是不同构建。按”只看名字不算 MD5”的规则，没有覆盖。</p>
+
+<h2 id="留下的东西">留下的东西</h2>
+
+<p>整个过程写了一些脚本，都在 <code class="language-plaintext highlighter-rouge">C:\Users\citie\</code>：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>文件</th>
+      <th>用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">dav_usb_sync.py</code></td>
+      <td>内部存储 → U 盘 增量同步，支持 <code class="language-plaintext highlighter-rouge">--dry-run</code> 和 <code class="language-plaintext highlighter-rouge">--allow</code> 单文件批准</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">dav_audit.py</code></td>
+      <td>源与目标全量大小对账</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">dav_diff.py</code></td>
+      <td>两个 WebDAV 目录的名称差集</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">dav_verify.py</code></td>
+      <td>抽样哈希校验</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">verify.ps1</code></td>
+      <td>U 盘身份验收（VID/PID/型号/容量/读速）</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">usb_pending_approval.txt</code></td>
+      <td>超大文件待批准清单</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">dt3-restore/</code> 里留着 STTool 的完整配置和踩坑记录，万一以后有新的工具版本，照着做就行，不用从头试。</p>
+
+<h2 id="最后">最后</h2>
+
+<p>盘现在是一块 128GB 的普通 U 盘，Ventoy 双分区完好，40GB 数据在里面，插上就能用。名字显示 <code class="language-plaintext highlighter-rouge">silicon-power USB Device</code> 而不是 <code class="language-plaintext highlighter-rouge">Kingston DataTraveler 3.0</code>，仅此而已。</p>
+
+<p>保修是回不来了。金士顿的条款里写着”原始识别信息已经被修改”不予保固，现在 VID/PID 和序列号都对不上外壳标签。不过这块盘从一开始就不是拿去保修的，它断电那次能活下来已经算运气好。</p>
+
+<p>那句”2251-19 别折腾”，我用一晚上验证了一遍。结论是：对。</p>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2026/10/18/android-kvm-windows11-steps/" data-toggle="tooltip" data-placement="top" title="照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64">
+                        Previous<br>
+                        <span>照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64</span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

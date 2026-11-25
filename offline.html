@@ -9,6 +9,9 @@
     <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
     <meta name="theme-color" content="#000000">
 
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
     <!-- Open Graph -->
     <meta property="og:title"
         content="Offline - 磁贴のblog">
@@ -56,7 +59,6 @@
     <script></script>
 </head>
 
-
 <!-- hack iOS CSS :active style -->
 <body ontouchstart="">
 
@@ -96,6 +98,8 @@
                         <li>
                             <a href="/archive/">Archive</a>
                         </li>
+                        
+                        
                         
                         
                         
@@ -202,6 +206,19 @@
     }
 
     
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
 </style>
 
 

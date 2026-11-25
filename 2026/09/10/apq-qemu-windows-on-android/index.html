@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="APQ 是一个基于 QEMU 4.2.0 的 Android 虚拟机应用，思路是在手机里跑一个 x86 虚拟机，再用 VNC 客户端连上它的显示输出。这期视频全程没有解说（BGM 是《勾指起誓》），纯靠画面演示，这里把流程整理成文字版。
+">
+    
+    <meta property="article:published_time" content=" 2026-09-10T20:00:00Z">
+    
+    
+    <meta property="article:author" content="磁贴">
+    
+    
+    <meta property="article:tag" content="APQ">
+    
+    <meta property="article:tag" content="QEMU">
+    
+    <meta property="article:tag" content="Windows">
+    
+    <meta property="article:tag" content="Android">
+    
+    <meta property="article:tag" content="虚拟机">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/2026/09/10/apq-qemu-windows-on-android/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/2026/09/10/apq-qemu-windows-on-android/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-apq-win.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-apq-win.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=APQ" title="APQ">APQ</a>
+                        
+                        <a class="tag" href="/archive/?tag=QEMU" title="QEMU">QEMU</a>
+                        
+                        <a class="tag" href="/archive/?tag=Windows" title="Windows">Windows</a>
+                        
+                        <a class="tag" href="/archive/?tag=Android" title="Android">Android</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA" title="虚拟机">虚拟机</a>
+                        
+                    </div>
+                    <h1>手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by 磁贴 on September 10, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>APQ 是一个基于 QEMU 4.2.0 的 Android 虚拟机应用，思路是在手机里跑一个 x86 虚拟机，再用 VNC 客户端连上它的显示输出。这期视频全程没有解说（BGM 是《勾指起誓》），纯靠画面演示，这里把流程整理成文字版。</p>
+
+<p>视频原版在 B 站：<a href="https://www.bilibili.com/video/BV1YV4y177Ri/">BV1YV4y177Ri</a>。<strong>先说一句重要的：视频简介里明确写了”该方法较为老旧，新版本安卓可能无法正常使用”</strong>，新机器翻车概不负责，想试的有个心理预期。</p>
+
+<h2 id="下载两个应用">下载两个应用</h2>
+
+<p>视频开头的便签里给了两个蓝奏云地址：</p>
+
+<ul>
+  <li>VNC Viewer 汉化版（3.6.1.42089，12.2MB）</li>
+  <li>APQ 测试版（1.6，71.9MB）</li>
+</ul>
+
+<p><img src="/assets/img/apq/01-download-links.jpg" alt="下载地址便签" /></p>
+
+<p>视频简介里还有一个打包的网盘链接（citie.lanzoul.com，密码 8ck5）和 QQ 群号 960262360，镜像文件在群文件里。两个 APK 依次下载安装，安装过程中系统推荐的”去应用商店下载”不用理。</p>
+
+<p><img src="/assets/img/apq/02-vnc-download.jpg" alt="VNC Viewer 下载" /></p>
+
+<h2 id="安装与权限">安装与权限</h2>
+
+<p>APQ 首次打开会申请权限：<strong>全部同意</strong>。包括联网权限（虚拟机联网用）、储存权限（读写镜像和配置文件），以及悬浮窗权限——悬浮窗透明像素是用来保持后台运行的，不给的话切出去虚拟机可能就没了。</p>
+
+<p><img src="/assets/img/apq/03-apq-install.jpg" alt="APQ 安装与权限" /></p>
+
+<h2 id="添加虚拟机配置">添加虚拟机配置</h2>
+
+<p>打开 APQ（界面标题栏显示 1.6 QEMU-4.2.0），主界面底部有”添加配置 / 镜像工厂 / ROOT 运行 / 关于”四个入口。点<strong>添加配置</strong>，按视频里的参数填：</p>
+
+<p><img src="/assets/img/apq/04-apq-main.jpg" alt="APQ 主界面" /></p>
+
+<ul>
+  <li><strong>磁盘 A</strong>：点文件夹图标，进入 <code class="language-plaintext highlighter-rouge">/storage/emulated/0/APQ</code> 选镜像。视频演示用的是 <code class="language-plaintext highlighter-rouge">win7mini.qcow2</code>（Windows 7 精简镜像，在 QQ 群下载）</li>
+  <li><strong>运行内存</strong>：<code class="language-plaintext highlighter-rouge">-m size=1024M</code>。默认只有 128M 肯定不够，视频里手机剩余 1231MB / 总共 3826MB，给虚拟机分了 1024M。注意参数说明里也提示了运存给太大反而会导致闪退和卡顿，量力而行</li>
+  <li><strong>网卡</strong>：<code class="language-plaintext highlighter-rouge">-net user -net nic,model=rtl8139</code></li>
+  <li><strong>显卡</strong>：<code class="language-plaintext highlighter-rouge">-vga vmware</code></li>
+  <li><strong>显示方式</strong>：<code class="language-plaintext highlighter-rouge">-vnc :0</code>——这就是后面要用 VNC 连的原因，虚拟机不直接出画面，而是通过 VNC 协议输出</li>
+  <li><strong>CPU 架构</strong>：<code class="language-plaintext highlighter-rouge">#sys:x86_64</code></li>
+  <li><strong>CPU</strong>：<code class="language-plaintext highlighter-rouge">-cpu coreduo</code></li>
+</ul>
+
+<p><img src="/assets/img/apq/05-config-file.jpg" alt="配置文件参数" /></p>
+
+<h3 id="cpu-设置">CPU 设置</h3>
+
+<p>CPU 部分选择 x86_64 架构和 coreduo 处理器型号。界面下方有提示：该选项在跨架构时并无多大用处，在这种情况下一般只能用到单线程。</p>
+
+<p><img src="/assets/img/apq/06-cpu-settings.jpg" alt="CPU 设置" /></p>
+
+<p>填完点保存，提示”配置文件保存成功”后返回主界面。</p>
+
+<h2 id="用-vnc-viewer-连接">用 VNC Viewer 连接</h2>
+
+<p>APQ 启动虚拟机后，切到 VNC Viewer，点右下角<strong>加号</strong>新建连接：</p>
+
+<ul>
+  <li><strong>地址</strong>：<code class="language-plaintext highlighter-rouge">127.0.0.1</code>（虚拟机就在本机，直接连回环地址）</li>
+  <li><strong>名字</strong>：随意，视频里填的”我的电脑”，也可以不取</li>
+</ul>
+
+<p><img src="/assets/img/apq/07-apq-running.jpg" alt="APQ 运行中" /></p>
+
+<p>创建后点连接，会弹出”<strong>未加密连接</strong>“的红色警告——这是正常的，本机 VNC 没有加密，点<strong>确定</strong>继续，Windows 桌面就出来了。可以把”每次警告我”关掉省得每次都弹。</p>
+
+<p><img src="/assets/img/apq/08-vnc-connect.jpg" alt="VNC 连接 127.0.0.1" /></p>
+
+<h2 id="和-lbochs-方案的对比">和 lbochs 方案的对比</h2>
+
+<p>同样是手机跑 Windows，APQ 背靠 QEMU，配置项是标准的 QEMU 参数写法，镜像格式用 qcow2，整体比 Bochs 那套更接近现代虚拟机的玩法；lbochs 胜在配置全是图形界面点选，门槛更低。两条路线我都写了记录，哪条顺手走哪条。再次提醒：APQ 这个方法年代较早，新安卓版本大概率跑不起来，纯属考古向折腾。</p>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2026/09/10/lbochs-windows-on-android/" data-toggle="tooltip" data-placement="top" title="用手机 lbochs 运行 Windows XP：安装与配置全过程">
+                        Previous<br>
+                        <span>用手机 lbochs 运行 Windows XP：安装与配置全过程</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2026/09/10/endfield-unlock-extreme-graphics/" data-toggle="tooltip" data-placement="top" title="终末地手机端解锁极高画质：iUnlocker 模块实操记录">
+                        Next<br>
+                        <span>终末地手机端解锁极高画质：iUnlocker 模块实操记录</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

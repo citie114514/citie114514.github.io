@@ -9,6 +9,9 @@
     <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
     <meta name="theme-color" content="#000000">
 
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
     <!-- Open Graph -->
     <meta property="og:title"
         content="磁贴のblog">
@@ -56,7 +59,6 @@
     <script></script>
 </head>
 
-
 <!-- hack iOS CSS :active style -->
 <body ontouchstart="">
 
@@ -96,6 +98,8 @@
                         <li>
                             <a href="/archive/">Archive</a>
                         </li>
+                        
+                        
                         
                         
                         
@@ -202,6 +206,19 @@
     }
 
     
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
 </style>
 
 
@@ -238,8 +255,264 @@
     <div class="col-lg-8 col-lg-offset-1 col-md-8 col-md-offset-1 col-sm-12
       col-xs-12 postlist-container">
       
+<div class="post-preview">
+    <a href="/2026/10/21/usb-flash-phison-ps2251-19-teardown/">
+        <h2 class="post-title">
+            一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                一块 Kingston DataTraveler 3.0，128GB，用了两年多。某天插在机器上正读写着，断电了。再插回去，磁盘管理里显示”无媒体”，容量 0，盘符消失。
+
+这种症状一般是主控进了保护态或者 MP 参数区出了问题。手上有个 Formatter_SiliconPower.exe（群联 PreFormat 的换皮版），跑了一遍，盘回来了：123,749,337,600 字节，ex...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on October 21, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/10/18/android-kvm-windows11-steps/">
+        <h2 class="post-title">
+            照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                上一篇写的是这半个月怎么一路错过来的，这篇只讲动手顺序。
+
+想听故事的去看那篇。这里默认你已经决定要刷，只想把机器弄出来。
+
+先花两分钟确认你是哪一批
+
+补丁不是按机型匹配的，是按 tee 固件的完整 SHA-256 匹配。同一个型号，不同批次，哈希就不一样。我手上两台 Redmi Note 11T Pro+，一台 f8f286f1，一台 a91f5ded，差得挺远。
+
+1
+2
+adb sh...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on October 18, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/10/18/android-kvm-windows11-xaga/">
+        <h2 class="post-title">
+            给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                这台 Redmi Note 11T Pro+ 现在能跑 Windows 11 ARM64，CPU-Z 里处理器写着 virt-10.0，系统信息里设备型号直接就是 “KVM Virtual Machine”。不是模拟，是硬件加速。
+
+但过程比结果难看多了：我误判过一次「变砖」，把成品的方案判死过一轮，还因为有段时间录屏突然恢复正常，重新推翻了自己写的结论。这篇把过程按发生顺序写下来，包括那些...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on October 18, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/13/android-chroot-mount-propagation/">
+        <h2 class="post-title">
+            从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                最开始，我只是想解决一个看起来很普通的问题：
+
+让家里的 Android 手机服务器，通过福建联通的公网 IPv6 从外网访问。
+
+最后，这件事却一路从 DDNS、IPv6、Cloudflare Tunnel、OpenFRP、自启动，一直挖到了 Linux mount propagation、Binder、devpts、PTY，甚至把 SSH 一并拖下了水。
+
+真正修复问题的代码其实只有很少...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 13, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/12/incomplete-projects/">
+        <h2 class="post-title">
+            我做过很多没有做完的项目
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                我做过很多项目。
+
+严格来说，也做过很多没有做完的项目。
+
+有些已经写了不少代码，有些只有一个文件夹，有些甚至只是某一天凌晨突然冒出来的一个想法。
+
+它们大多数最后都没有上线，也没有什么人知道。
+
+以前我会觉得这是一件挺失败的事情。
+
+一个项目开了头，没有结尾；一个想法兴冲冲地开始，过几天就再也没有打开过。
+
+电脑里总是会留下一些名字很奇怪的文件夹，里面可能是一堆代码，也可能只是一个 REA...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 12, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/12/pc-chronicles/">
+        <h2 class="post-title">
+            我的电脑编年史：从 H61 到 AM4
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                我已经记不太清，自己是什么时候开始真正喜欢上电脑的了。
+
+小时候的电脑，对我来说可能就是一个可以玩游戏、看视频、上网的东西。那时候我大概不会想到，几年之后，我会因为一块主板到底值不值得买、一个 CPU 能不能超频、显卡温度为什么这么高，而在网上翻几十个帖子。
+
+但现在回头看，我好像一直都是这样过来的。
+
+H61：一切的起点
+
+我的第一段电脑经历，并不是什么高端配置。
+
+那是一套很普通的 H6...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 12, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/10/endfield-unlock-extreme-graphics/">
+        <h2 class="post-title">
+            终末地手机端解锁极高画质：iUnlocker 模块实操记录
+        </h2>
+        
+        <h3 class="post-subtitle">
+            Root + Zygisk-Next，让非旗舰机也能开 1036P
+        </h3>
+        
+        <div class="post-content-preview">
+            
+                相信很多人的手机配置都比不上 8 Elite 和 iPhone 17 Pro Max。《明日方舟：终末地》的”极高画质”（1036P）默认只对旗舰芯片开放，中低端机型在设置里根本看不到这个选项。这期视频就是教你怎么用 iUnlocker 模块把它强开出来，演示机是一台 Redmi Note 11T Pro+。
+
+视频原版在 B 站：BV1xdctzkEsc，这篇博文把流程整理成文字版，方便照...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 10, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/10/apq-qemu-windows-on-android/">
+        <h2 class="post-title">
+            手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                APQ 是一个基于 QEMU 4.2.0 的 Android 虚拟机应用，思路是在手机里跑一个 x86 虚拟机，再用 VNC 客户端连上它的显示输出。这期视频全程没有解说（BGM 是《勾指起誓》），纯靠画面演示，这里把流程整理成文字版。
+
+视频原版在 B 站：BV1YV4y177Ri。先说一句重要的：视频简介里明确写了”该方法较为老旧，新版本安卓可能无法正常使用”，新机器翻车概不负责，想试的...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 10, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2026/09/10/lbochs-windows-on-android/">
+        <h2 class="post-title">
+            用手机 lbochs 运行 Windows XP：安装与配置全过程
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                lbochs 是把 x86 模拟器 Bochs 移植到 Android 上的应用，不靠任何虚拟化硬件加速，纯软件指令翻译，所以慢是慢了点，但好处是什么手机都能跑。这期视频演示了从安装到在手机上点亮 Windows XP 经典蓝天草地桌面的完整过程。
+
+视频原版在 B 站：BV1ZP4y1y7YX，镜像和 lbochs 安装包都在 QQ 群（960262360）里。下面是文字版流程。
+
+
+
+安...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴 on September 10, 2026
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/apq/%E6%95%99%E7%A8%8B/2026/09/10/apq-vm-config-supplement/">
+        <h2 class="post-title">
+            APQ虚拟机配置补充教程：磁盘与CPU进阶设置
+        </h2>
+        
+        <div class="post-content-preview">
+            
+                这是上一期 APQ 教程的补充，讲磁盘配置和 CPU 进阶设置这些细节。APQ 是一个在 Android 上运行 QEMU 虚拟机的工具，可以拿来跑 Windows 之类的系统。
+
+一、配置文件概览
+
+打开 APQ 的”添加配置文件”页面，能看到完整的虚拟机配置项：
+
+
+
+
+  磁盘A：主硬盘镜像（如 win7mini.qcow2）
+  运行内存：虚拟机内存大小（如 1024M）
+  网卡：...
+            
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 磁贴のblog on September 10, 2026
+    </p>
+</div>
+<hr>
+
 
 <!-- Pager -->
+
+<ul class="pager">
+    
+    
+    <li class="next">
+        <a href="/page2">Older Posts &rarr;</a>
+    </li>
+    
+</ul>
 
 
     </div>
@@ -259,6 +532,46 @@
         
         
         
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
     </div>
 </section>
 

@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="想在 Android 手机上玩 Java 版 Minecraft 的玩家不少，但很多人不知道从哪下手。这篇把两期视频的内容合在一起，分别讲 PojavLauncher 和 HMCL-PE 两个启动器怎么用。
+">
+    
+    <meta property="article:published_time" content=" 2026-09-10T04:00:00Z">
+    
+    
+    
+    <meta property="article:tag" content="Minecraft">
+    
+    <meta property="article:tag" content="PojavLauncher">
+    
+    <meta property="article:tag" content="HMCL-PE">
+    
+    <meta property="article:tag" content="Android">
+    
+    <meta property="article:tag" content="Java版">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/minecraft/%E6%95%99%E7%A8%8B/2026/09/10/minecraft-java-android-launcher/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/minecraft/%E6%95%99%E7%A8%8B/2026/09/10/minecraft-java-android-launcher/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-mc-java.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-mc-java.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=Minecraft" title="Minecraft">Minecraft</a>
+                        
+                        <a class="tag" href="/archive/?tag=PojavLauncher" title="PojavLauncher">PojavLauncher</a>
+                        
+                        <a class="tag" href="/archive/?tag=HMCL-PE" title="HMCL-PE">HMCL-PE</a>
+                        
+                        <a class="tag" href="/archive/?tag=Android" title="Android">Android</a>
+                        
+                        <a class="tag" href="/archive/?tag=Java%E7%89%88" title="Java版">Java版</a>
+                        
+                    </div>
+                    <h1>手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by 磁贴のblog on September 10, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>想在 Android 手机上玩 Java 版 Minecraft 的玩家不少，但很多人不知道从哪下手。这篇把两期视频的内容合在一起，分别讲 PojavLauncher 和 HMCL-PE 两个启动器怎么用。</p>
+
+<h2 id="一pojavlauncher-启动器">一、PojavLauncher 启动器</h2>
+
+<p>PojavLauncher 是个开源的 Android 端 Java 版 Minecraft 启动器，多版本和模组加载都支持。</p>
+
+<h3 id="1-下载与安装">1. 下载与安装</h3>
+
+<p>先要把这几个资源下齐：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>资源</th>
+      <th>下载地址</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PojavLauncher</td>
+      <td><a href="https://github.com/PojavLauncherTeam/PojavLauncher/releases">GitHub Releases</a></td>
+    </tr>
+    <tr>
+      <td>Forge</td>
+      <td><a href="https://files.minecraftforge.net/">files.minecraftforge.net</a></td>
+    </tr>
+    <tr>
+      <td>Fabric</td>
+      <td><a href="https://fabricmc.net/use/">fabricmc.net</a></td>
+    </tr>
+    <tr>
+      <td>Optifine</td>
+      <td><a href="https://www.optifine.net/home">optifine.net</a></td>
+    </tr>
+    <tr>
+      <td>Open4es 光影</td>
+      <td><a href="https://github.com/Open4Es/Open4Es-Shader">GitHub</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="/assets/img/mc-launcher/pojav-download.jpg" alt="下载页面" /></p>
+
+<p>下载完装 APK 就行。</p>
+
+<h3 id="2-登录账号">2. 登录账号</h3>
+
+<p>打开 PojavLauncher，登录方式有三种：</p>
+
+<ul>
+  <li>微软账号：推荐，能过正版验证</li>
+  <li>离线模式：输个用户名就行（只能玩单人）</li>
+  <li>选择账号：管理已经登录的账号</li>
+</ul>
+
+<p><img src="/assets/img/mc-launcher/pojav-login.jpg" alt="登录界面" /></p>
+
+<h3 id="3-基本设置">3. 基本设置</h3>
+
+<p>设置页面里有几个值得看的参数：</p>
+
+<ul>
+  <li>Java 运行时环境：需要重装的话点”卸载 Java 运行时环境”</li>
+  <li>长按触发时长：改长按的触发时长（默认 500ms）</li>
+  <li>分辨率缩放倍率：在开销和画面之间自己找平衡</li>
+</ul>
+
+<p>选好版本点<strong>启动游戏</strong>就行。</p>
+
+<p><img src="/assets/img/mc-launcher/pojav-settings.jpg" alt="设置界面" /></p>
+
+<h3 id="4-进入游戏">4. 进入游戏</h3>
+
+<p>启动后进的就是 Minecraft Java 版主界面，Singleplayer、Multiplayer、Minecraft Realms 都在老地方。</p>
+
+<p><img src="/assets/img/mc-launcher/pojav-mc-menu.jpg" alt="游戏主菜单" /></p>
+
+<h3 id="5-操控方式">5. 操控方式</h3>
+
+<p>PojavLauncher 用虚拟按键操控：</p>
+
+<ul>
+  <li>左侧：方向键（主/副方向）、视角控制</li>
+  <li>右侧：GUI、背包、键盘、TAB</li>
+  <li>顶部：鼠标开关</li>
+</ul>
+
+<p><img src="/assets/img/mc-launcher/pojav-gameplay1.jpg" alt="游戏画面1" />
+<img src="/assets/img/mc-launcher/pojav-gameplay2.jpg" alt="游戏画面2" /></p>
+
+<h3 id="6-安装-forge">6. 安装 Forge</h3>
+
+<p>要用 Forge 模组的话，先在手机浏览器里下载 Forge 安装器，再回 PojavLauncher 里装对应版本。</p>
+
+<p><img src="/assets/img/mc-launcher/pojav-forge-download.jpg" alt="Forge下载" /></p>
+
+<h3 id="7-光影设置">7. 光影设置</h3>
+
+<p>装好 Optifine 就能用光影包了，推荐 Open4es，画面设置里各项参数都能调。</p>
+
+<p><img src="/assets/img/mc-launcher/pojav-shader.jpg" alt="光影设置" /></p>
+
+<h2 id="二hmcl-pe-启动器">二、HMCL-PE 启动器</h2>
+
+<p>HMCL-PE（Hello Minecraft! Launcher Pocket Edition）是 HMCL 的 Android 移动端版本，功能更全一些。</p>
+
+<h3 id="1-安装">1. 安装</h3>
+
+<p>下载 HMCL-PE 的 APK 直接装。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-install.jpg" alt="安装APK" /></p>
+
+<h3 id="2-添加离线模式账户">2. 添加离线模式账户</h3>
+
+<p>打开 HMCL-PE，点”添加离线模式账户”，用户名随便填，离线账号就建好了。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-account.jpg" alt="添加账户" /></p>
+
+<h3 id="3-安装-optifine">3. 安装 OptiFine</h3>
+
+<p>HMCL-PE 自带版本管理，OptiFine 这类东西直接在启动器里装，不用额外折腾。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-optifine.jpg" alt="安装OptiFine" /></p>
+
+<h3 id="4-启动器主界面">4. 启动器主界面</h3>
+
+<p>主界面分成这几块：</p>
+
+<ul>
+  <li>左侧导航栏：新闻、开发控制台、崩溃日志、设置</li>
+  <li>版本选择和启动按钮</li>
+  <li>账户管理</li>
+</ul>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-main.jpg" alt="主界面" /></p>
+
+<h3 id="5-自定义控制">5. 自定义控制</h3>
+
+<p>控制布局能自定义的地方不少：悬浮窗、侧边栏、侧滑手势、不锁定悬浮窗、联机模块菜单、高级输入都支持。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-controls.jpg" alt="控制设置" /></p>
+
+<h3 id="6-进入游戏">6. 进入游戏</h3>
+
+<p>启动后进的是 Minecraft Java Edition 主界面，和电脑版一模一样。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-mc-menu.jpg" alt="游戏主菜单" /></p>
+
+<h3 id="7-游戏画面">7. 游戏画面</h3>
+
+<p>操控同样是虚拟按键加鼠标模拟，玩起来没什么卡顿。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-gameplay.jpg" alt="游戏画面" /></p>
+
+<h3 id="8-光影与画面设置">8. 光影与画面设置</h3>
+
+<p>一样支持 OptiFine 光影，画面设置里各项参数都能调。</p>
+
+<p><img src="/assets/img/mc-launcher/hmclpe-shader.jpg" alt="光影设置" /></p>
+
+<h2 id="三两款启动器对比">三、两款启动器对比</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>特性</th>
+      <th>PojavLauncher</th>
+      <th>HMCL-PE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>开源</td>
+      <td>√</td>
+      <td>√</td>
+    </tr>
+    <tr>
+      <td>Forge/Fabric 支持</td>
+      <td>√</td>
+      <td>√</td>
+    </tr>
+    <tr>
+      <td>Optifine 安装</td>
+      <td>需手动</td>
+      <td>内置安装</td>
+    </tr>
+    <tr>
+      <td>控制自定义</td>
+      <td>基础</td>
+      <td>丰富</td>
+    </tr>
+    <tr>
+      <td>光影支持</td>
+      <td>√</td>
+      <td>√</td>
+    </tr>
+    <tr>
+      <td>多账号管理</td>
+      <td>√</td>
+      <td>√</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="四常见问题">四、常见问题</h2>
+
+<p><strong>Q: 手机配置要求是什么？</strong>
+A: 建议 4GB 以上内存、64 位处理器。视频里测试用的是腾讯黑鲨游戏手机3。</p>
+
+<p><strong>Q: 可以玩模组吗？</strong>
+A: 可以，PojavLauncher 和 HMCL-PE 都支持 Forge 和 Fabric 模组加载。</p>
+
+<p><strong>Q: 光影会卡吗？</strong>
+A: 看手机性能和光影包复杂度，Open4es 算比较轻量的选择。</p>
+
+<blockquote>
+  <p>视频教程来源：<a href="https://space.bilibili.com/">被win11吃掉的磁贴</a> B站频道</p>
+</blockquote>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2026/09/09/131566-xyz-unsuspend-appeal/" data-toggle="tooltip" data-placement="top" title="131566.xyz 解封申诉记录：从 serverHold 到恢复解析">
+                        Previous<br>
+                        <span>131566.xyz 解封申诉记录：从 serverHold 到恢复解析</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/apq/%E6%95%99%E7%A8%8B/2026/09/10/apq-vm-config-supplement/" data-toggle="tooltip" data-placement="top" title="APQ虚拟机配置补充教程：磁盘与CPU进阶设置">
+                        Next<br>
+                        <span>APQ虚拟机配置补充教程：磁盘与CPU进阶设置</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

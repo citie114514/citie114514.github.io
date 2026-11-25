@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="131566.xyz 解封申诉记录：从 serverHold 到恢复解析 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="我的域名 131566.xyz 在 2026 年 8 月被 .xyz 注册局挂上了 serverHold，全网 NXDOMAIN，绑在 Cloudflare 上的站点一直无法激活。从 8 月中旬开始排查，到 9 月 8 日确认解封，前后二十多天，中间给注册局和十几家安全厂商都递过申诉，被驳回过，也放弃过几家。这篇文章按时间线把整个过程记下来，算是个存档，也方便以后遇到同样问题的人参考。
+">
+    
+    <meta property="article:published_time" content=" 2026-09-09T21:00:00Z">
+    
+    
+    <meta property="article:author" content="磁贴">
+    
+    
+    <meta property="article:tag" content="域名">
+    
+    <meta property="article:tag" content="serverHold">
+    
+    <meta property="article:tag" content="申诉">
+    
+    <meta property="article:tag" content="VirusTotal">
+    
+    <meta property="article:tag" content="DNS">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/2026/09/09/131566-xyz-unsuspend-appeal/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>131566.xyz 解封申诉记录：从 serverHold 到恢复解析 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/2026/09/09/131566-xyz-unsuspend-appeal/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-domain-appeal.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-domain-appeal.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=%E5%9F%9F%E5%90%8D" title="域名">域名</a>
+                        
+                        <a class="tag" href="/archive/?tag=serverHold" title="serverHold">serverHold</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E7%94%B3%E8%AF%89" title="申诉">申诉</a>
+                        
+                        <a class="tag" href="/archive/?tag=VirusTotal" title="VirusTotal">VirusTotal</a>
+                        
+                        <a class="tag" href="/archive/?tag=DNS" title="DNS">DNS</a>
+                        
+                    </div>
+                    <h1>131566.xyz 解封申诉记录：从 serverHold 到恢复解析</h1>
+                    
+                    <h2 class="subheading">一次域名被注册局挂起后的排查、清黑与沟通全过程</h2>
+                    <span class="meta">Posted by 磁贴 on September 9, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>我的域名 131566.xyz 在 2026 年 8 月被 .xyz 注册局挂上了 <code class="language-plaintext highlighter-rouge">serverHold</code>，全网 NXDOMAIN，绑在 Cloudflare 上的站点一直无法激活。从 8 月中旬开始排查，到 9 月 8 日确认解封，前后二十多天，中间给注册局和十几家安全厂商都递过申诉，被驳回过，也放弃过几家。这篇文章按时间线把整个过程记下来，算是个存档，也方便以后遇到同样问题的人参考。</p>
+
+<h2 id="域名为什么会被封">域名为什么会被封</h2>
+
+<p>131566.xyz 注册于 2025-05-07，注册商是 Spaceship（IANA 3862），到期时间 2028-05-07，并没有过期。我很早就把 NS 改到了 Cloudflare 的 <code class="language-plaintext highlighter-rouge">abdullah.ns.cloudflare.com</code> 和 <code class="language-plaintext highlighter-rouge">ada.ns.cloudflare.com</code>，但 Cloudflare 那边一直显示 pending nameserver，怎么点 “Check nameservers now” 都不认。</p>
+
+<p>排查后确认 NS 变更本身是成功的——whois 里 Name Server 已经是 Cloudflare 的两个地址。真正的问题在 <code class="language-plaintext highlighter-rouge">Domain Status: serverHold</code>：这是注册局层面的状态，不是注册商层面的。.xyz 注册局（由 CentralNic 运营）把域名从 DNS 区域里摘掉了，TLD 直接返回 NXDOMAIN，Cloudflare 查不到委托，自然永远不会激活。</p>
+
+<p>至于为什么会被挂 serverHold，我只能推断：这个域名之前挂过基于 Cloudflare Workers 的反代和伪装页面，大约一年前因为 phishing 举报被处理过一次。当时我向 Spaceship 申诉过一次（原邮件已删），Spaceship 解开了注册商侧的封禁，但漏掉了注册局侧的 serverHold，域名就这么一直挂着。这只是我的推断，注册局从未给过具体的封禁理由。</p>
+
+<p>2026 年 8 月中旬我再次联系 Spaceship，对方的回复很明确：域名是被 .xyz 注册局挂起的，需要直接联系注册局，并给出了官方解封入口 <a href="https://gen.xyz/unsuspend">gen.xyz/unsuspend</a>。到这里，申诉对象才算真正确定下来。</p>
+
+<h2 id="提交前的准备先查清黑名单">提交前的准备：先查清黑名单</h2>
+
+<p>gen.xyz 的解封表单有明确的步骤要求：先确认域名是否在各黑名单里，被列入的要先申诉移除，然后描述已采取的动作并提供证据。所以正式提交之前，我先做了一圈核查。</p>
+
+<p>截至 2026-08-23 的结果：Spamhaus DBL、SURBL、URIBL 均未列入，Google Safe Browsing 显示 Clean。唯一的麻烦在 VirusTotal——91 家引擎里有 10 家把域名标成 Phishing 或 Malicious，包括 Webroot、BitDefender、ESET、Sophos、Fortinet 和几家小厂。</p>
+
+<p>策略因此变成两步走：先把 VT 上能清的厂商清掉，再向注册局提交解封申请。第一个突破是 Webroot：向 BrightCloud 提交变更申请后，对方把域名改判为 “Parked Domains”（发布于数据库 9.863），VT 同步变成 Clean，计数从 10/91 降到 9/91。同期我还提交了 BitDefender、ESET 的误报申诉，并用邮件向 Sophos 立了案（case #03456873）。不太顺利的是 Fortinet，首次复核在两小时内由自动流水线完成，结论是维持 Phishing。</p>
+
+<h2 id="正式提交注册局工单与厂商申诉">正式提交：注册局工单与厂商申诉</h2>
+
+<p>2026-08-29，我决定不等 VT 降到理想值，先把注册局的申请递出去。在 gen.xyz/unsuspend 上 Lookup 域名，确认状态是 “Suspended for Abuse reported”，点 Request Review，过了 reCAPTCHA 后按表单填写：Spamhaus/SURBL/URIBL/Google Safe Browsing 均未列入；域名当前 NXDOMAIN、不承载任何内容；已向 ESET、VIPRE、Sophos、Bitdefender 提交误报申诉，Webroot 已改判；今后域名仅用作个人博客。提交后拿到工单 #992668，随后收到确认邮件，XYZ Anti-Abuse Team 承诺 48 小时内响应。同一天我还补了几家厂商：ESET 二次提交成功，VIPRE 通过 Zendesk 帮助台提交（需要先在邮箱里点验证链接），Forcepoint 提交了重分类申请并收到 case #01066738 的确认邮件。</p>
+
+<p>这里有个明知的风险：提交时 VT 仍是 10/91（Last Analysis 停在 4 天前），而注册局的要求是从所有黑名单移除后才重新激活，这单很可能被要求继续清理后复审。事实也确实如此。</p>
+
+<p>8 月 31 日是密集操作的一天。先是收到工单状态更新——#992668 从 Open 变为 Answered，但偏偏 gen.xyz 的客户端区这时数据库故障，页面只有 “Could not connect to the database”，回复正文看不了。我改用 RDAP 直接查 CentralNic：状态仍是 <code class="language-plaintext highlighter-rouge">server hold</code> + <code class="language-plaintext highlighter-rouge">client transfer prohibited</code>，last changed 停在 2026-05-05，说明注册局侧还没有任何动作。同一天我把 VT 上剩下的厂商全部覆盖了一遍：G-Data（Friendly Captcha 需要人工过验证）、Lionic、CyRadar、CRDF（拿到参考号 #20260831624599）、alphaMountain（Freshdesk 工单 #124531）。Fortinet 的二次升级申诉则因为人机验证被拦、且首次已被正式驳回，我决定放弃。</p>
+
+<h2 id="驳回循环与胶着">驳回、循环与胶着</h2>
+
+<p>接下来陆续回来的消息，坏消息居多。Forcepoint 判定 “Phishing and Other Frauds”，维持原分类；CRDF 人工审核后认为不符合移除条件，维持 Malicious；加上此前的 Fortinet，十多家厂商里已有三家被正式驳回。gen.xyz 工单系统恢复后，我终于看到了 8 月 31 日凌晨的回复（Agent 543623），核心意思是：域名因违反反滥用政策被标记，必须联系被列入的黑名单逐一复审，等把所有黑名单都移除后，回复工单附上 delisting 证据，注册局才会考虑解封。也就是说，VT 上那一串厂商不清理掉，工单不会再往前走。</p>
+
+<p>和 CRDF 的拉锯是整个过程里最消耗耐心的部分。它先驳回了我的申请，但提示可以在 web thread 里补充新信息。9 月 2 日我在线程里回了两轮：第一轮提供注册商账户层面的所有权证明（注册日期、Spaceship 账户、Cloudflare NS 配置），并说明可以配合添加 TXT 验证记录；第二轮按它要求的 “concrete technical changes” 路径，解释域名当前 NXDOMAIN、A/NS/TXT 均无解析，serverHold 状态下在 @131566.xyz 上设置 DNS TXT 在技术上不可行，请求对方改走注册商渠道验证所有权。结果是 CRDF 反复回同一句模板——”请提供一个具体的下一步”——明显是自动回复循环。我转而通过它的联系表单升级（参考号 175567-657283），被系统自动归类后又用 forced override 链接把消息送进了人工队列，但等来的还是同样的模板。到此我放弃了 CRDF。</p>
+
+<p>同一时期，其余已提交申诉的厂商一封邮件回复都没有，局面一度胶着：已确认改判的只有 Webroot，确认 delist 的只有 G-Data（回复原话是 “The submitted URL is not reachable, it is no longer detected by us.”），三家被驳回，剩下的全部状态不明。</p>
+
+<h2 id="转机静默改判与解封">转机：静默改判与解封</h2>
+
+<p>9 月 2 日下午，我在工单 #992668 里回复了阶段性证据：Webroot 已改判 Parked Domains、G-Data 已确认不再检测、Spamhaus/SURBL/URIBL/Google Safe Browsing 均未列入、域名当前不承载任何内容，并说明 ESET、BitDefender、VIPRE、Sophos、alphaMountain、Lionic、CyRadar、Chong Lua Dao 的误报申诉都在处理中，请求注册局移除 serverHold。工单状态随即从 Answered 变为 Customer-Reply。</p>
+
+<p>真正的转机出现在 9 月 8 日。这天我复查 VirusTotal，发现计数已经从 10/91 降到了 6/89：BitDefender、ESET、VIPRE、Chong Lua Dao、Lionic 五家全部变成了 Clean——全部是静默改判，没有一家发过邮件通知。仍在标记的只剩六家：alphaMountain、CyRadar、Sophos 还在处理，CRDF、Fortinet、Forcepoint 已被驳回。</p>
+
+<p>同一天我重新打开 gen.xyz 工单，才发现注册局其实早在 9 月 2 日 17:09 就回复了（Agent 654278），我之前一直没注意到。回复的关键句是 “This domain will be unsuspended and closely monitored”，同时警告如果域名继续出现滥用行为可能被无限期重新暂停，并提示 WHOIS 更新最长需要 24 小时。我立刻做了验证：RDAP 查询显示状态只剩 <code class="language-plaintext highlighter-rouge">client transfer prohibited</code>，<code class="language-plaintext highlighter-rouge">serverHold</code> 已经移除；NS 委派恢复，公共 DNS（1.1.1.1、8.8.8.8）都能解析到 Cloudflare 的两个 NS；A 记录暂时只返回 SOA，说明委派成功，就差最后一步——登录 Cloudflare 对 131566.xyz 点一次 “Check nameservers now”，站点激活后解析即可生效。</p>
+
+<p>至此，这场持续二十多天的申诉算是走完了。域名从注册局挂起、全网 NXDOMAIN，恢复到正常委派状态；VT 上的标记从 10 家降到 6 家，剩下的几家已不影响解封结果。</p>
+
+<h2 id="经验总结">经验总结</h2>
+
+<p>几条从这次经历里实际得到的经验：</p>
+
+<ul>
+  <li>先分清封禁发生在哪一层。注册商侧的限制找注册商，<code class="language-plaintext highlighter-rouge">serverHold</code> 是注册局状态，只能找注册局； Spaceship 的回复其实一开始就把方向指明白了，只是要先看懂 whois 里的状态字段。</li>
+  <li>注册局解封的核心是黑名单证据链，而 VirusTotal 是最直观的进度表。厂商要逐个提交误报申诉，而且很多厂商改判后不发任何通知，定期复查 VT 比等邮件靠谱——这次有五家都是静默改判的。</li>
+  <li>被正式驳回的厂商不必死磕。Fortinet、CRDF、Forcepoint 最终都没能移除，但注册局还是同意了”解封并密切监控”，可见它看的是整体清理进展，不要求绝对清零。当然这只是本案的结果，不代表普遍规则。</li>
+  <li>域名处于 NXDOMAIN 本身是最有力的论据之一：不解析、无内容，就不可能在钓鱼任何东西，几乎每一份申诉文案我都用到了这一点。</li>
+  <li>申诉表单的人机验证对数据中心 IP 很不友好，好几次提交都需要换到家庭宽带手动过验证码，提前有心理预期能省不少时间。</li>
+  <li>最后，解封是有条件的。注册局明确说了会密切监控、再犯可能无限期重封，所以恢复之后这个域名只会挂博客内容——这也是我在申诉里作出的承诺。</li>
+</ul>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/minecraft/%E6%95%99%E7%A8%8B/2026/09/10/minecraft-java-android-launcher/" data-toggle="tooltip" data-placement="top" title="手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程">
+                        Next<br>
+                        <span>手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

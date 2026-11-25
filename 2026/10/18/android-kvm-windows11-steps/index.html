@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="上一篇写的是这半个月怎么一路错过来的，这篇只讲动手顺序。
+">
+    
+    <meta property="article:published_time" content=" 2026-10-18T19:30:00Z">
+    
+    
+    <meta property="article:author" content="磁贴">
+    
+    
+    <meta property="article:tag" content="Android">
+    
+    <meta property="article:tag" content="KVM">
+    
+    <meta property="article:tag" content="MTK">
+    
+    <meta property="article:tag" content="教程">
+    
+    <meta property="article:tag" content="Windows">
+    
+    <meta property="article:tag" content="QEMU">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/2026/10/18/android-kvm-windows11-steps/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/2026/10/18/android-kvm-windows11-steps/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-kvm-steps.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-kvm-steps.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: center center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=Android" title="Android">Android</a>
+                        
+                        <a class="tag" href="/archive/?tag=KVM" title="KVM">KVM</a>
+                        
+                        <a class="tag" href="/archive/?tag=MTK" title="MTK">MTK</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E6%95%99%E7%A8%8B" title="教程">教程</a>
+                        
+                        <a class="tag" href="/archive/?tag=Windows" title="Windows">Windows</a>
+                        
+                        <a class="tag" href="/archive/?tag=QEMU" title="QEMU">QEMU</a>
+                        
+                    </div>
+                    <h1>照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by 磁贴 on October 18, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>上一篇写的是这半个月怎么一路错过来的，这篇只讲动手顺序。</p>
+
+<p>想听故事的去看<a href="/2026/10/18/android-kvm-windows11-xaga/">那篇</a>。这里默认你已经决定要刷，只想把机器弄出来。</p>
+
+<h2 id="先花两分钟确认你是哪一批">先花两分钟确认你是哪一批</h2>
+
+<p>补丁不是按机型匹配的，是按 <code class="language-plaintext highlighter-rouge">tee</code> 固件的完整 SHA-256 匹配。同一个型号，不同批次，哈希就不一样。我手上两台 Redmi Note 11T Pro+，一台 <code class="language-plaintext highlighter-rouge">f8f286f1</code>，一台 <code class="language-plaintext highlighter-rouge">a91f5ded</code>，差得挺远。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>adb shell su <span class="nt">-c</span> <span class="s1">'dd if=/dev/block/by-name/tee_a bs=4096 2&gt;/dev/null | sha256sum'</span>
+adb shell su <span class="nt">-c</span> <span class="s1">'dd if=/dev/block/by-name/tee_b bs=4096 2&gt;/dev/null | sha256sum'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">tee_b</code> 那个槽从来没被动过，它是判断批次的锚点。如果 <code class="language-plaintext highlighter-rouge">tee_b</code> 和你查到的成品基座对不上，说明这台机器跟成品不是一个来源，往下走得自己构建。</p>
+
+<h2 id="需要的东西">需要的东西</h2>
+
+<p>解锁的 Bootloader、能用的 root（KernelSU 或 Magisk）、PC 上的 Python 3.10 以上，还有 adb。</p>
+
+<p>adb 这个坑得单独说。脚本要在 PATH 里找它，很多人电脑上没装，或者装了没加进 PATH，第一步就报找不到设备。所以我在发行版里塞了一份 platform-tools：优先用系统那份，系统没有就用包里的。你要是想自己装 adb，记得把 platform-tools 目录加进环境变量 PATH。</p>
+
+<p>没有 root 就别往下看了。市面上那种”免 root 跑虚拟机”的方案走的是 TCG，纯软件模拟，慢十几倍到几十倍，装个系统要几小时。这个项目只做 KVM 路线。</p>
+
+<p>另外建议用 USB 线，别用无线 adb 刷分区。技术上能刷，我心里不踏实。</p>
+
+<h2 id="第一件事不是刷是备份">第一件事不是刷，是备份</h2>
+
+<p>一键脚本会强制备份六个分区：<code class="language-plaintext highlighter-rouge">tee_a</code>、<code class="language-plaintext highlighter-rouge">tee_b</code>、<code class="language-plaintext highlighter-rouge">lk_a</code>、<code class="language-plaintext highlighter-rouge">lk_b</code>、<code class="language-plaintext highlighter-rouge">preloader_raw_a</code>、<code class="language-plaintext highlighter-rouge">seccfg</code>，每个都校验哈希，坏一个就停。</p>
+
+<p>顺带说一句 <code class="language-plaintext highlighter-rouge">preloader</code>。原厂 preloader 的 EDL 需要小米售后账号授权，意思是 tee 刷坏、机器起不来的时候，你手上没有免授权的救援通道。工程 preloader 让写入不需要授权，但它不关开机校验，两件事别混。所以理想顺序是先确认能刷工程 preloader，再动 tee。</p>
+
+<p>如果你不确定手上是不是工程版，看哈希：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>adb shell su <span class="nt">-c</span> <span class="s1">'dd if=/dev/block/by-name/preloader_raw_a bs=4096 2&gt;/dev/null | sha256sum'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">056ed47a...</code> 开头就是那份已经流出来的工程版，不用再刷。</p>
+
+<h2 id="跑一键脚本">跑一键脚本</h2>
+
+<p>最省事的方式是下载发行版压缩包，里面工具都打包好了，不用 clone 任何东西：</p>
+
+<p>到 <a href="https://github.com/citie114514/xaga-windows-arm64-kvm/releases/latest">Releases</a> 拿 <code class="language-plaintext highlighter-rouge">xaga-kvm-release-*.zip</code>，解压，双击 <code class="language-plaintext highlighter-rouge">start-kvm.bat</code> 就行。adb 也打包在里面，电脑上不用先装任何东西。脚本会自己建虚拟环境、装依赖、打上游补丁，然后一路跑到底。第一次运行要装 Python 依赖，几分钟。</p>
+
+<p>想自己控制每一步的话，按下面的方式来：</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="n">git</span><span class="w"> </span><span class="nx">clone</span><span class="w"> </span><span class="nx">https://github.com/MT6895-Mainline/mtk-mod-tee-nogz</span><span class="w">  </span><span class="nx">D:\mtk-mod-tee-nogz</span><span class="w">
+</span><span class="n">git</span><span class="w"> </span><span class="nx">clone</span><span class="w"> </span><span class="nx">https://github.com/kasnria001/pwnage24mtk</span><span class="w">           </span><span class="nx">D:\pwnage24mtk</span><span class="w">
+</span><span class="n">cd</span><span class="w"> </span><span class="nx">D:\mtk-mod-tee-nogz</span><span class="w">
+</span><span class="n">python</span><span class="w"> </span><span class="nt">-m</span><span class="w"> </span><span class="nx">venv</span><span class="w"> </span><span class="o">.</span><span class="nf">venv</span><span class="w">
+</span><span class="o">.</span><span class="nx">\.venv\Scripts\python.exe</span><span class="w"> </span><span class="nt">-m</span><span class="w"> </span><span class="nx">pip</span><span class="w"> </span><span class="nx">install</span><span class="w"> </span><span class="nt">-r</span><span class="w"> </span><span class="nx">requirements.txt</span><span class="w">
+
+</span><span class="n">git</span><span class="w"> </span><span class="nx">clone</span><span class="w"> </span><span class="nx">https://github.com/citie114514/xaga-windows-arm64-kvm</span><span class="w">  </span><span class="nx">D:\xaga-kvm</span><span class="w">
+</span><span class="n">cd</span><span class="w"> </span><span class="nx">D:\xaga-kvm\scripts</span><span class="w">
+</span><span class="o">.</span><span class="n">\kvm-oneclick.ps1</span><span class="w"> </span><span class="nt">-Profile</span><span class="w"> </span><span class="nx">xagapro</span><span class="w"> </span><span class="se">`
+</span><span class="w">  </span><span class="nt">-TeeFixRepo</span><span class="w"> </span><span class="nx">D:\mtk-mod-tee-nogz</span><span class="w"> </span><span class="se">`
+</span><span class="w">  </span><span class="nt">-PwnageDir</span><span class="w"> </span><span class="nx">D:\pwnage24mtk</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">-Profile</code> 必须是 <code class="language-plaintext highlighter-rouge">xagapro</code>，不是可选项。上游那个 <code class="language-plaintext highlighter-rouge">xaga</code> profile 对应的是另一批固件（<code class="language-plaintext highlighter-rouge">bd4b13a7</code>），拿它去配你的 <code class="language-plaintext highlighter-rouge">f8f286f1</code>，脚本第一步哈希校验就过不去，直接中止。这是设计如此，不是 bug。</p>
+
+<p>不想真刷就加 <code class="language-plaintext highlighter-rouge">-DryRun</code>，会一路做到签名和校验，把待刷镜像留在磁盘上。</p>
+
+<p>脚本跑起来先打印型号、序列号、系统版本。录视频的话记得把这行挡掉。</p>
+
+<p>第一次运行会看到它在改上游仓库，加一个 <code class="language-plaintext highlighter-rouge">sign_all_flag</code> 的定义、往 profiles 里塞 <code class="language-plaintext highlighter-rouge">xagapro</code>。这是上游确实缺的东西，不改的话走到签名那步必然 NameError。脚本做成了幂等，改过就跳过。</p>
+
+<p>中间会停下来要你在手机上点授权：USB 调试的”一律允许”，还有 KernelSU 给 <code class="language-plaintext highlighter-rouge">adb shell</code> 的 root。各点一次就行。</p>
+
+<p>如果设备升过 Android 16，<code class="language-plaintext highlighter-rouge">lk_a</code> 大概率已经被 OTA 换掉了。补丁在真机上照样能用（这点我实测过），但构建工具的离线回归需要配对的那支 lk，脚本会去 <code class="language-plaintext highlighter-rouge">lk-archive</code> 里找。实在找不到，就别构建了，直接用 <code class="language-plaintext highlighter-rouge">flash-tee.ps1</code> 刷仓库里的成品。</p>
+
+<h2 id="刷完重启先把手放下">刷完重启，先把手放下</h2>
+
+<p>这一步劝退的人最多。</p>
+
+<p>刷完重启，屏幕会停在第二屏，转圈，一两分钟没动静。看起来跟变砖一模一样。</p>
+
+<p>我第一次就是这么判断的，进 fastboot 把备份刷了回去，白折腾一轮。后来才知道 ATF 的签名校验发生在 preloader 阶段的 <code class="language-plaintext highlighter-rouge">bl2_ext</code>，远早于内核。<strong>能看到第二屏，就说明补丁已经被接受了</strong>，后面只是启动链里某处在等 GZ 的回应，等不到就超时往下走。</p>
+
+<p>所以判据就两条：</p>
+
+<p>停在第二屏，<code class="language-plaintext highlighter-rouge">adb devices</code> 能看到设备，等，等到满三分钟。停在第一屏，或者黑屏之后自己跳进 fastboot，那才是真出问题。</p>
+
+<p>后来我把这个现象搞清楚了，跟开机次数没关系，是 <code class="language-plaintext highlighter-rouge">vendor_boot</code>。</p>
+
+<p>刷了下面说的那个软编补丁之后，第二屏的等待明显缩短，有时候几乎感觉不到；把 <code class="language-plaintext highlighter-rouge">vendor_boot</code> 刷回原厂，等待又回来了。同一台机器来回刷了两次，都这个规律。</p>
+
+<p>推测原因是同一件事：venc/vdec 驱动 probe 的时候要等 VCP 的握手，而这条握手依赖 EL2 那条链，NoGZ 之后必然超时。驱动匹配不上就不 probe，也就不必等。</p>
+
+<p>不过原厂 <code class="language-plaintext highlighter-rouge">vendor_boot</code> 配 NoGZ tee 的组合仍然是慢的，所以这条规则不能省：等满三分钟。</p>
+
+<h2 id="验证">验证</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>adb shell su <span class="nt">-c</span> <span class="s1">'ls -l /dev/kvm'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>看到 <code class="language-plaintext highlighter-rouge">crw-rw-rw- 10, 232</code> 就成了。</p>
+
+<p>想确认不是假象，用系统自带的 crosvm 拉一个 microdroid 起来，能看到 guest 内核打印 <code class="language-plaintext highlighter-rouge">Booting Linux on physical CPU</code> 就是整条链闭环了。命令在仓库 docs/01 里。</p>
+
+<h2 id="想要录屏也正常">想要录屏也正常</h2>
+
+<p>裸刷 tee 之后，硬件编解码会失效：录屏 0 字节，Moonlight 无响应，QQ 图片不显示。原因是 venc/vdec 在 open 时要通过 IPI 问 VCP 支持哪些帧尺寸，而 VCP 的握手依赖 EL2 那条链。</p>
+
+<p>解决办法是把 <code class="language-plaintext highlighter-rouge">vendor_boot</code> 的 dtb 里两个 compatible 字符串各改一个字符，让驱动匹配不上、不绑定，框架找不到硬编只能走软编：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>mediatek,mt6895-vcodec-dec → mediatek,mt6895-vcodec-de0
+mediatek,mt6895-vcodec-enc → mediatek,mt6895-vcodec-en0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>一共 2 个字节，长度不变。改完重启，<code class="language-plaintext highlighter-rouge">screenrecord</code> 出来 1.8 MB 的完整 H.264，logcat 里编码器是 <code class="language-plaintext highlighter-rouge">c2.android.avc.encoder</code>。</p>
+
+<p>顺带一个没想到的好处：开机也变快了，第二屏不再卡那一两分钟。</p>
+
+<p>这个我写成脚本了：</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="n">cd</span><span class="w"> </span><span class="nx">D:\xaga-kvm\scripts</span><span class="w">
+</span><span class="o">.</span><span class="n">\flash-vendor-boot.ps1</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>它会备份原厂 <code class="language-plaintext highlighter-rouge">vendor_boot_a</code>，基座对得上就用仓库成品，对不上就用你本机的备份现场改那 2 个字节，写完回读校验。回滚镜像的路径也会打印出来。</p>
+
+<p>有件事得提醒：软编能不能用，取决于你的 ROM。我主力机那台 A15 的 ROM 里，<code class="language-plaintext highlighter-rouge">libmedia.so</code> 缺 <code class="language-plaintext highlighter-rouge">MetaDataBase::writeToParcel</code> 这个符号，软编根本起不来；备用机的 A16 正常。同一套方案两台机器两个结果，所以刷完一定要自己跑一次 <code class="language-plaintext highlighter-rouge">screenrecord</code> 看字节数，别信文档。</p>
+
+<h2 id="出问题的时候">出问题的时候</h2>
+
+<p>卡在第一屏，或者黑屏之后进 fastboot：补丁没被接受。先确认回读的 <code class="language-plaintext highlighter-rouge">tee_a</code> 哈希是不是你想要的那个，再确认基座对不对。救回来很简单，进 fastboot：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>fastboot flash tee_a tee_a_backup.img
+fastboot reboot
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>只动 <code class="language-plaintext highlighter-rouge">tee_a</code> 一个分区，用户数据和系统都不受影响。这条路我自己用过。</p>
+
+<p>卡在第二屏超过五分钟没有任何变化：也回滚，换正确基座的成品再试。</p>
+
+<p>系统起来了但 QEMU 起不来：一般是三个地方。<code class="language-plaintext highlighter-rouge">-cpu host</code> 必须配 <code class="language-plaintext highlighter-rouge">taskset f0</code> 绑到 A78 簇，不然 big.LITTLE 上会随机失败；<code class="language-plaintext highlighter-rouge">-vnc 127.0.0.1:0</code> 里的 0 是 display 号不是端口，端口是 5900；DroidVM 的 QEMU 需要 <code class="language-plaintext highlighter-rouge">export LD_LIBRARY_PATH=/system/lib64</code>。</p>
+
+<h2 id="几件别做的事">几件别做的事</h2>
+
+<p>别用 SP Flash 深刷 tee，那会把 BL 重新锁上，之后 fastboot 就不方便了。</p>
+
+<p>别拿别人博客里的哈希硬套。这套工具是固件样本级别的，差一个字节都不认。跨基座的补丁实测能启动，但那属于运气，不属于方法。</p>
+
+<p>别把开了 KVM 的机器当主力机。软编吃 CPU，1080p 还行，4K 或者高帧率会卡；4 GB 内存分给虚拟机之后手机自己也紧张。我这台现在就是台实验机。</p>
+
+<h2 id="最后">最后</h2>
+
+<p>刷完的样子：Windows 11 ARM64 能进桌面，能上网，CPU-Z 单核 247、多核 709，录屏和串流都正常。</p>
+
+<p>至于银行 App 和各种检测，跟刷不刷 tee 没关系。补丁只改了 EL2 归谁，没碰 TEE。KeyMint、Gatekeeper、Widevine、指纹、安全元件，我刷前刷后逐项对过，一模一样。BL 解锁本来就是 Play Integrity 过不去的原因，那是另一件事。</p>
+
+<p>代码、文档、成品镜像、还有那份记了十几条坑的清单，都在 <a href="https://github.com/citie114514/xaga-windows-arm64-kvm">xaga-windows-arm64-kvm</a>。真卡住了，提 issue 比在评论区问快。</p>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2026/10/18/android-kvm-windows11-xaga/" data-toggle="tooltip" data-placement="top" title="给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程">
+                        Previous<br>
+                        <span>给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2026/10/21/usb-flash-phison-ps2251-19-teardown/" data-toggle="tooltip" data-placement="top" title="一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控">
+                        Next<br>
+                        <span>一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

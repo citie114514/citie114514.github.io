@@ -1,3 +1,99 @@
 [
   
+    {
+      "title"    : "一次失败的 U 盘量产：Kingston DT3.0 的 PS2251-19 主控",
+      "subtitle" : "",
+      "tags"     : "U盘, 量产, PS2251-19, 群联, Kingston, WebDAV",
+      "url"      : "/2026/10/21/usb-flash-phison-ps2251-19-teardown/",
+      "date"     : "2026-10-21 23:30:00 +0000"
+    } ,
+  
+    {
+      "title"    : "照着做：天玑 8100 开 KVM 跑 Windows 11 ARM64",
+      "subtitle" : "",
+      "tags"     : "Android, KVM, MTK, 教程, Windows, QEMU",
+      "url"      : "/2026/10/18/android-kvm-windows11-steps/",
+      "date"     : "2026-10-18 19:30:00 +0000"
+    } ,
+  
+    {
+      "title"    : "给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程",
+      "subtitle" : "",
+      "tags"     : "Android, KVM, MTK, Windows, QEMU, tee",
+      "url"      : "/2026/10/18/android-kvm-windows11-xaga/",
+      "date"     : "2026-10-18 18:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查",
+      "subtitle" : "",
+      "tags"     : "Android, Linux, chroot, IPv6, mount, 排障",
+      "url"      : "/2026/09/13/android-chroot-mount-propagation/",
+      "date"     : "2026-09-13 00:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "我做过很多没有做完的项目",
+      "subtitle" : "",
+      "tags"     : "编程, 项目, 成长",
+      "url"      : "/2026/09/12/incomplete-projects/",
+      "date"     : "2026-09-12 00:30:00 +0000"
+    } ,
+  
+    {
+      "title"    : "我的电脑编年史：从 H61 到 AM4",
+      "subtitle" : "",
+      "tags"     : "硬件, 装机, 回忆",
+      "url"      : "/2026/09/12/pc-chronicles/",
+      "date"     : "2026-09-12 00:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "终末地手机端解锁极高画质：iUnlocker 模块实操记录",
+      "subtitle" : "Root + Zygisk-Next，让非旗舰机也能开 1036P",
+      "tags"     : "明日方舟终末地, Android, Root, 模块, 教程",
+      "url"      : "/2026/09/10/endfield-unlock-extreme-graphics/",
+      "date"     : "2026-09-10 21:20:00 +0000"
+    } ,
+  
+    {
+      "title"    : "手机上用 APQ 运行 Windows：QEMU 虚拟机 + VNC 连接",
+      "subtitle" : "",
+      "tags"     : "APQ, QEMU, Windows, Android, 虚拟机",
+      "url"      : "/2026/09/10/apq-qemu-windows-on-android/",
+      "date"     : "2026-09-10 20:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "用手机 lbochs 运行 Windows XP：安装与配置全过程",
+      "subtitle" : "",
+      "tags"     : "lbochs, Bochs, Windows XP, Android, 虚拟机",
+      "url"      : "/2026/09/10/lbochs-windows-on-android/",
+      "date"     : "2026-09-10 19:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "APQ虚拟机配置补充教程：磁盘与CPU进阶设置",
+      "subtitle" : "",
+      "tags"     : "APQ, 虚拟机, Android, QEMU, 教程",
+      "url"      : "/apq/%E6%95%99%E7%A8%8B/2026/09/10/apq-vm-config-supplement/",
+      "date"     : "2026-09-10 05:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "手机玩Java版Minecraft：PojavLauncher与HMCL-PE启动器教程",
+      "subtitle" : "",
+      "tags"     : "Minecraft, PojavLauncher, HMCL-PE, Android, Java版",
+      "url"      : "/minecraft/%E6%95%99%E7%A8%8B/2026/09/10/minecraft-java-android-launcher/",
+      "date"     : "2026-09-10 04:00:00 +0000"
+    } ,
+  
+    {
+      "title"    : "131566.xyz 解封申诉记录：从 serverHold 到恢复解析",
+      "subtitle" : "一次域名被注册局挂起后的排查、清黑与沟通全过程",
+      "tags"     : "域名, serverHold, 申诉, VirusTotal, DNS",
+      "url"      : "/2026/09/09/131566-xyz-unsuspend-appeal/",
+      "date"     : "2026-09-09 21:00:00 +0000"
+    } 
+  
 ]

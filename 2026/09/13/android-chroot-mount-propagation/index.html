@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是被Win11吃掉的磁贴的个人博客，记录技术与生活 | 与你一起发现更大的世界">
+    <meta name="keywords" content="磁贴, citie, 磁贴的博客, Citie Blog, 博客, 个人网站, 技术分享, 生活记录">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Baidu site verification -->
+    <meta name="baidu-site-verification" content="codeva-uu321ShzR3" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查 - 磁贴のblog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="最开始，我只是想解决一个看起来很普通的问题：
+">
+    
+    <meta property="article:published_time" content=" 2026-09-13T00:00:00Z">
+    
+    
+    <meta property="article:author" content="磁贴">
+    
+    
+    <meta property="article:tag" content="Android">
+    
+    <meta property="article:tag" content="Linux">
+    
+    <meta property="article:tag" content="chroot">
+    
+    <meta property="article:tag" content="IPv6">
+    
+    <meta property="article:tag" content="mount">
+    
+    <meta property="article:tag" content="排障">
+    
+    
+    <meta property="og:image" content="https://131566.xyzhttps://github.com/citie114514.png">
+    <meta property="og:url" content="https://131566.xyz/2026/09/13/android-chroot-mount-propagation/">
+    <meta property="og:site_name" content="磁贴のblog">
+
+    <title>从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查 - 磁贴のblog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://131566.xyz/2026/09/13/android-chroot-mount-propagation/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">磁贴のblog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">关于</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-chroot.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-chroot.jpg');
+        background: ;
+    }
+
+    
+
+    /*
+     * 窄屏对齐调整。
+     * 头部高度由内容撑开（与视口宽度无关），所以窄屏下容器比例只有约 1.07，
+     * 而头图是 2.33:1，background-size: cover 会横向裁掉一半宽度，
+     * 使原本位于右下角的主题图形完全出画。
+     * 这里把裁切窗口对齐到右侧，让图形重新进入画面。
+     */
+    @media only screen and (max-width: 767px){
+        header.intro-header{
+            background-position: right center;
+        }
+    }
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=Android" title="Android">Android</a>
+                        
+                        <a class="tag" href="/archive/?tag=Linux" title="Linux">Linux</a>
+                        
+                        <a class="tag" href="/archive/?tag=chroot" title="chroot">chroot</a>
+                        
+                        <a class="tag" href="/archive/?tag=IPv6" title="IPv6">IPv6</a>
+                        
+                        <a class="tag" href="/archive/?tag=mount" title="mount">mount</a>
+                        
+                        <a class="tag" href="/archive/?tag=%E6%8E%92%E9%9A%9C" title="排障">排障</a>
+                        
+                    </div>
+                    <h1>从 IPv6 外网访问到 Mount Propagation：一次 Android chroot 故障的完整排查</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by 磁贴 on September 13, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>最开始，我只是想解决一个看起来很普通的问题：</p>
+
+<p><strong>让家里的 Android 手机服务器，通过福建联通的公网 IPv6 从外网访问。</strong></p>
+
+<p>最后，这件事却一路从 DDNS、IPv6、Cloudflare Tunnel、OpenFRP、自启动，一直挖到了 Linux mount propagation、Binder、devpts、PTY，甚至把 SSH 一并拖下了水。</p>
+
+<p>真正修复问题的代码其实只有很少几行，但找到这些代码为什么需要存在，花掉了远比修改本身多得多的时间。</p>
+
+<p>这篇就把整个过程记下来，包括那些当时看着合理、后来被新证据推翻的判断。</p>
+
+<hr />
+
+<h2 id="一切的起点ipv6-明明通为什么外网就是连不上">一切的起点：IPv6 明明通，为什么外网就是连不上？</h2>
+
+<p>我的设备环境有点特殊。</p>
+
+<p>服务机并不是一台传统意义上的 Linux 服务器，而是一台 Android 手机。网络结构大致是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>福建联通
+   │
+中兴光猫
+192.168.1.1
+   │
+小米路由器
+192.168.31.1
+   │
+Android 手机
+192.168.31.78
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>手机上通过 chroot 跑着 Ubuntu，里面有 OpenList、nginx、qBittorrent、OpenSSH、Tailscale、frpc、cloudflared 等服务。</p>
+
+<p>最开始，我的目标非常简单：</p>
+
+<blockquote>
+  <p>DDNS-GO 更新公网 IPv6 → 外网直接访问手机上的服务。</p>
+</blockquote>
+
+<p>手机本身确实拿到了公网 IPv6，出站 IPv6 也完全正常。</p>
+
+<p>一开始甚至连手机的公网 IPv6 都没从局域网邻居表里看到，于是我一度怀疑手机根本没有拿到公网地址。</p>
+
+<p>结果换一种方式，从 DNS 解析出来的 IPv6 地址反向测试，反而发现它确实就是手机。</p>
+
+<p>也就是说：</p>
+
+<blockquote>
+  <p><strong>公网 IPv6 有，IPv6 出站有，甚至 ICMPv6 入站都能通，但 TCP 就是不通。</strong></p>
+</blockquote>
+
+<p>这时候问题就开始变得有意思了。</p>
+
+<hr />
+
+<h2 id="从-sshd-一路查到光猫">从 sshd 一路查到光猫</h2>
+
+<p>进一步登录手机检查后，我发现 sshd 最初只监听 IPv4：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ListenAddress 0.0.0.0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>于是改成 IPv6 后继续测试。</p>
+
+<p>结果又遇到了 Android 特有的奇怪行为：只写 IPv6 后，IPv4 监听反而出了问题。</p>
+
+<p>最后采用双行：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>ListenAddress 0.0.0.0
+ListenAddress ::
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>才实现真正的双栈监听。</p>
+
+<p>但即使这样，外网 TCP 仍然无法连接。</p>
+
+<p>于是开始从网络最上游一路往下查。</p>
+
+<p>全国多个测试节点的结果很有代表性：</p>
+
+<ul>
+  <li>大多数节点都能解析出 IPv6</li>
+  <li>ICMPv6 可以到达</li>
+  <li>TCP 连接全部失败</li>
+</ul>
+
+<p>这已经基本排除了 DNS 和 DDNS。</p>
+
+<p>接着继续进入光猫检查。</p>
+
+<p>光猫的普通 Telnet 权限很有限，但通过隐藏管理入口拿到了更高权限，检查了防火墙与转发规则。看到的结果却相当奇怪：</p>
+
+<blockquote>
+  <p>IPv6 转发策略并没有明显拒绝入站 TCP。</p>
+</blockquote>
+
+<p>甚至光猫自己明确开放的 WAN 端口，从外网测试也一样 TCP 不通，但 ICMPv6 依然可以到达。</p>
+
+<p>这时候结论开始清晰起来：</p>
+
+<p><strong>不是我的 DDNS 错了，不是手机没有公网 IPv6，也不是局域网路由器简单地把端口挡住了。</strong></p>
+
+<p>而是这条 IPv6 入站链路本身存在”可以 Ping，但 TCP 进不来”的限制。</p>
+
+<p>于是我决定不再和这条链路死磕。</p>
+
+<hr />
+
+<h1 id="换一个方向既然入站进不来那就主动向外连">换一个方向：既然入站进不来，那就主动向外连</h1>
+
+<p>既然家庭网络的 IPv6 入站 TCP 走不通，那最自然的方案就是：</p>
+
+<blockquote>
+  <p>不让外面的客户端主动打进来，而是让手机主动建立出站隧道。</p>
+</blockquote>
+
+<p>最终采用了两条路线。</p>
+
+<h3 id="web-服务cloudflare-tunnel">Web 服务：Cloudflare Tunnel</h3>
+
+<p>OpenList 和 OpenSpeedTest 之类的 HTTP/HTTPS 服务通过 Cloudflare Tunnel 暴露：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>用户浏览器
+    ↓
+Cloudflare
+    ↓
+cloudflared
+    ↓
+localhost:5244 / localhost:3000
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这样客户端不需要安装任何额外软件，浏览器直接访问域名即可。</p>
+
+<h3 id="sshopenfrp">SSH：OpenFRP</h3>
+
+<p>SSH 是另外一种情况。</p>
+
+<p>Cloudflare Tunnel 对普通 TCP/SSH 客户端存在额外限制，如果要求外网直接使用标准 SSH 客户端，我最终还是选择了 OpenFRP：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>SSH Client
+   ↓
+OpenFRP
+   ↓
+frpc
+   ↓
+sshd :22
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>最后形成了一个很实用的组合：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>服务</th>
+      <th>外网入口</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>OpenList</td>
+      <td>Cloudflare Tunnel</td>
+    </tr>
+    <tr>
+      <td>OpenSpeedTest</td>
+      <td>Cloudflare Tunnel</td>
+    </tr>
+    <tr>
+      <td>SSH</td>
+      <td>OpenFRP</td>
+    </tr>
+    <tr>
+      <td>OpenList 备用入口</td>
+      <td>OpenFRP</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>而且 Cloudflare 和 OpenFRP 之间还有一定程度的互备。</p>
+
+<p>至此，外网访问问题基本解决。</p>
+
+<p>但真正的大坑，才刚刚开始。</p>
+
+<hr />
+
+<h1 id="接下来我决定让手机上的服务真正像服务器一样开机自启">接下来，我决定让手机上的服务真正”像服务器一样”开机自启</h1>
+
+<p>最开始这台手机并不像服务器。</p>
+
+<p>Android 开机以后，容器并不会自己完整启动。</p>
+
+<p>没有 systemd，没有传统意义上的 rc.local，/data/adb/service.d 也基本是空的。</p>
+
+<p>于是开始建立自己的启动链。</p>
+
+<p>核心结构大致变成：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre>Android 开机
+   ↓
+Magisk service.d
+   ↓
+等待网络
+   ↓
+挂载 chroot
+   ↓
+进入 Ubuntu
+   ↓
+启动 sshd
+   ↓
+启动 services.sh
+   ↓
+启动 Tailscale
+   ↓
+启动 cron
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>OpenList 又比较特殊。</p>
+
+<p>它本身是 Android 原生应用，并不是 chroot 服务，所以只能通过 Android 的 <code class="language-plaintext highlighter-rouge">am</code> 来启动，而不是在 Ubuntu 里面直接启动。</p>
+
+<p>慢慢地，这台手机开始真的像一台小型服务器了。</p>
+
+<hr />
+
+<h1 id="然后一个小需求把事情带到了完全不同的方向">然后，一个”小需求”把事情带到了完全不同的方向</h1>
+
+<p>后来只是想做两个小调整：</p>
+
+<p>一个是修复 citie 用户的 sudo。</p>
+
+<p>另一个是把 ddns-go 从主服务里移出去。</p>
+
+<p>结果这两个小需求，最终把整个系统最深层的问题都暴露出来了。</p>
+
+<hr />
+
+<h1 id="第一个异常sudo-怎么都不能正常工作">第一个异常：sudo 怎么都不能正常工作？</h1>
+
+<p>最终发现问题不是 sudo 本身，而是：</p>
+
+<blockquote>
+  <p>Android 的 /data 所在文件系统以 <code class="language-plaintext highlighter-rouge">nosuid</code> 方式挂载。</p>
+</blockquote>
+
+<p>因此 /usr/bin/sudo 即便本身是 setuid，也无法正常利用 setuid 机制提权。</p>
+
+<p>最后通过对 chroot 根目录做 bind/remount，使容器这部分重新具备需要的 suid 行为，再配合 sudoers 配置，sudo 才恢复。</p>
+
+<p>问题解决了。</p>
+
+<p>但真正麻烦的东西随后出现。</p>
+
+<hr />
+
+<h1 id="第二个异常opencodebun-莫名其妙-segmentation-fault">第二个异常：OpenCode/Bun 莫名其妙 Segmentation Fault</h1>
+
+<p>OpenCode 在容器里面运行时出现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>Segmentation fault
+abort
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>一开始看起来像是 Bun、JavaScriptCore 或者 ARM64 环境的问题。</p>
+
+<p>但继续深入后，发现一个非常诡异的事实：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>/proc/self/maps
+/proc/version
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这些本来应该一定存在的 /proc 内容，在容器里面竟然直接报：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>No such file or directory
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这意味着：</p>
+
+<blockquote>
+  <p><strong>不是 OpenCode 本身坏了，是容器里的 /proc 已经坏了。</strong></p>
+</blockquote>
+
+<p>于是开始把宿主 Android 的：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev
+/proc
+/sys
+/dev/pts
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>bind 到 chroot 里面。</p>
+
+<p>OpenCode 果然恢复。</p>
+
+<p>当时我以为：</p>
+
+<blockquote>
+  <p>好了，问题解决。</p>
+</blockquote>
+
+<p>后来才发现，这其实只是把真正的问题埋了下去。</p>
+
+<hr />
+
+<h1 id="一个长期存在的误判35930-到底是什么">一个长期存在的误判：35930 到底是什么？</h1>
+
+<p>这次排查里，我还纠正了一个自己错了很久的判断。</p>
+
+<p>之前经常拿：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>:35930
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>来判断 OpenList 是否正常。</p>
+
+<p>后来发现：</p>
+
+<blockquote>
+  <p><strong>35930 实际上是 tailscaled 使用的端口。</strong></p>
+</blockquote>
+
+<p>所以之前很多”OpenList 已经正常启动”的判断，其实是假的。</p>
+
+<p>这也让我意识到：</p>
+
+<p>监控指标本身选错了，后面所有”服务正常”的结论就都可能建立在错误的基础上。</p>
+
+<p>后来改成真正的 HTTP 访问：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>localhost:5244 → HTTP 200
+localhost:3000 → HTTP 200
+localhost:8080 → HTTP 200
+localhost:8443 → HTTP 200
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这才算真正验证服务。</p>
+
+<hr />
+
+<h1 id="openlist-又炸了">OpenList 又”炸了”</h1>
+
+<p>过了一阵子，我再次发现 OpenList 访问异常。</p>
+
+<p>这一次的问题已经不像普通应用故障。</p>
+
+<p>SSH 有时候能连上，但登录后马上断开。</p>
+
+<p>Android 的 <code class="language-plaintext highlighter-rouge">am</code> 命令偶发异常。</p>
+
+<p>PTY 报：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>out of pty devices
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>更严重的是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/dev/binder
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>开始出现异常。</p>
+
+<p>于是继续排查。</p>
+
+<p>这一次终于碰到了真正的核心：</p>
+
+<h1 id="mount-propagation">Mount Propagation</h1>
+
+<hr />
+
+<h1 id="原来-chroot-根本没有你想象中的隔离">原来 chroot 根本没有你想象中的”隔离”</h1>
+
+<p>很多人第一次接触 chroot 时，会天然认为：</p>
+
+<blockquote>
+  <p>“既然进了容器，那里面的挂载就是容器自己的。”</p>
+</blockquote>
+
+<p>但 chroot 并不自动创建 mount namespace。</p>
+
+<p>这意味着：</p>
+
+<p><strong>文件系统根目录变了，不代表 mount namespace 也隔离了。</strong></p>
+
+<p>而我的 Android chroot 就属于这种情况。</p>
+
+<p>宿主的：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev
+/proc
+/sys
+/dev/pts
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>本身处于 shared propagation。</p>
+
+<p>例如：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev       shared:2
+/dev/pts   shared:3
+/proc      shared:4
+/sys       shared:5
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>问题就从这里开始。</p>
+
+<hr />
+
+<h1 id="真正危险的不是-bind本身是-propagation">真正危险的不是 bind，本身是 propagation</h1>
+
+<p>表面上看，我执行的是很普通的操作：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>mount <span class="nt">-o</span> <span class="nb">bind</span> /dev <span class="s2">"/dev"</span>
+mount <span class="nt">-o</span> <span class="nb">bind</span> /proc <span class="s2">"/proc"</span>
+mount <span class="nt">-o</span> <span class="nb">bind</span> /sys <span class="s2">"/sys"</span>
+mount <span class="nt">-o</span> <span class="nb">bind</span> /dev/pts <span class="s2">"/dev/pts"</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>从字符串层面完全没问题。</p>
+
+<p>甚至如果你只是做静态审计，很可能会得出：</p>
+
+<blockquote>
+  <p>“这几个 bind 看起来挺正常。”</p>
+</blockquote>
+
+<p>但 Linux 真正危险的地方在于：</p>
+
+<blockquote>
+  <p><strong>这些 mount 自己属于什么 propagation group？</strong></p>
+</blockquote>
+
+<p>因为目标 mount 仍然处于 shared peer。</p>
+
+<p>于是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre>bind
+  ↓
+产生 mount event
+  ↓
+沿 shared propagation 传播
+  ↓
+宿主 peer 收到事件
+  ↓
+宿主对应路径产生新的 mount
+  ↓
+覆盖原来的 mount
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后灾难开始。</p>
+
+<hr />
+
+<h1 id="宿主的-mount-开始一层一层堆起来">宿主的 mount 开始一层一层堆起来</h1>
+
+<p>排查过程中，可以看到宿主的 /dev、/proc、/sys、/dev/pts 上不断出现新的 mount ID。</p>
+
+<p>原本应该是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev      41
+/dev/pts  42
+/proc     43
+/sys      44
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>后来开始出现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>41
+104227
+67901
+...
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>其他路径也是类似情况。</p>
+
+<p>这意味着每次 bind 都没有老老实实停留在 chroot 里。</p>
+
+<p>它实际上在<strong>反向影响宿主 Android</strong>。</p>
+
+<hr />
+
+<h1 id="而真正倒霉的是-binder-和-devpts">而真正倒霉的是 Binder 和 devpts</h1>
+
+<p>Android 的 Binder 本来位于：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/dev/binderfs
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>PTY 则依赖：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/dev/pts
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>当这些目录被新的覆盖层遮掉以后，后果非常直接。</p>
+
+<h3 id="binder">Binder</h3>
+
+<p>原本：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>/dev/binder
+→ /dev/binderfs/binder
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>后来 Binderfs 被覆盖，/dev/binder 变成异常状态。</p>
+
+<p>结果：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>am
+ADB
+scrcpy
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>都开始出现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>Binder driver '/dev/binder' could not be opened
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="pty">PTY</h3>
+
+<p>/dev/pts 被异常挂载覆盖之后：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/dev/pts/ptmx
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>消失。</p>
+
+<p>然后 sshd 虽然还能监听：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>:22
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>但是给用户创建伪终端失败。</p>
+
+<p>于是出现一个非常迷惑的现象：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>SSH connection
+    ↓
+能连上
+    ↓
+能看到 Ubuntu banner
+    ↓
+突然 Connection closed
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>实际上不是 SSH 密码，也不是 sshd 配置。</p>
+
+<p>而是：</p>
+
+<blockquote>
+  <p><strong>sshd 根本拿不到 PTY。</strong></p>
+</blockquote>
+
+<hr />
+
+<h1 id="然后又发现了第二个问题boot-脚本居然执行了两遍">然后又发现了第二个问题：boot 脚本居然执行了两遍</h1>
+
+<p>事情已经够复杂了，结果继续查日志又发现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>boot script start
+boot script start
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>同一时间出现两次。</p>
+
+<p>后来发现 /data/adb/service.d 里居然放着一个：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>99-chroot-boot.sh.bak-propfix
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>而且还是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>0755
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>也就是说，它不是普通备份。</p>
+
+<p>它是一个：</p>
+
+<blockquote>
+  <p><strong>可执行的完整 Magisk service.d 脚本。</strong></p>
+</blockquote>
+
+<p>Magisk 看到以后，自然把它也执行。</p>
+
+<p>于是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre>正式 boot 脚本
+      +
+备份 boot 脚本
+      ↓
+执行两遍
+      ↓
+bind 两遍
+      ↓
+propagation 两遍
+      ↓
+宿主 overlay 增长得更快
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这就解释了为什么问题会被放大得如此严重。</p>
+
+<hr />
+
+<h1 id="最终的修复方向终于明确">最终的修复方向终于明确</h1>
+
+<p>这时候已经有三个明确的根因：</p>
+
+<h3 id="根因一">根因一</h3>
+
+<p>mount propagation 没隔离。</p>
+
+<h3 id="根因二">根因二</h3>
+
+<p>boot 脚本被可执行备份文件重复执行。</p>
+
+<h3 id="根因三">根因三</h3>
+
+<p>之前使用的 mount –make-private 工具选错了。</p>
+
+<p>Android 的 toybox：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/system/bin/mount
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>不支持我们需要的那种语法。</p>
+
+<p>而 BusyBox：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/system/xbin/mount
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>虽然支持 private，但：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>mount <span class="nt">-o</span> private /path
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>会因为参数形式进入 fstab 解析，同样失败。</p>
+
+<p>最终实测下来，当前设备真正可用的是：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/system/xbin/mount <span class="nt">--make-private</span> <span class="s2">"/path"</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>返回：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>rc=0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>并且 shared: 计数实际下降。</p>
+
+<hr />
+
+<h1 id="最后的修复其实非常简单">最后的修复其实非常简单</h1>
+
+<p>对于每个目标：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev
+/proc
+/sys
+/dev/pts
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>在 bind 前后做 private：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>/system/xbin/mount <span class="nt">--make-private</span> <span class="s2">"/X"</span> 2&gt;/dev/null
+mount <span class="nt">-o</span> <span class="nb">bind</span> /宿主/X <span class="s2">"/X"</span>
+/system/xbin/mount <span class="nt">--make-private</span> <span class="s2">"/X"</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>也就是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>bind 前：
+先把嫁接点设为 private
+
+bind：
+
+再把新 mount 设为 private
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>同时把可执行的：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>99-chroot-boot.sh.bak-propfix
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>移出：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/data/adb/service.d
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h1 id="为什么必须前后各一次">为什么必须”前后各一次”？</h1>
+
+<p>这里最关键的一点不是”命令成功了”。</p>
+
+<p>而是：</p>
+
+<blockquote>
+  <p><strong>bind 前的那个 mount 和 bind 后新产生的 mount，都必须确保 propagation 属性符合预期。</strong></p>
+</blockquote>
+
+<p>所以最终方案不是简单地把一条失败命令换掉，而是形成：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre>目标 mount
+    ↓
+private
+    ↓
+bind
+    ↓
+新 mount
+    ↓
+private
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这样才能确保 mount event 不再继续向宿主传播。</p>
+
+<hr />
+
+<h1 id="真正的验收重启">真正的验收：重启</h1>
+
+<p>这种问题最怕的是：</p>
+
+<blockquote>
+  <p>当前看着好了，下一次开机又复发。</p>
+</blockquote>
+
+<p>所以最后不是简单地看：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>rc=0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>而是直接重启。</p>
+
+<p>然后分别检查：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>boot + 1 min
++120s
++360s
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>结果非常漂亮。</p>
+
+<p>修复前：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev      41 → 104227 → 67901 → ...
+/proc     43 → 102553 → 49150 → ...
+/sys      44 → 103204 → 57972 → ...
+/dev/pts  42 → 大量 tmpfs
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>修复后：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>/dev      41
+/dev/pts  42
+/proc     43
+/sys      44
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>三次采样：</p>
+
+<blockquote>
+  <p><strong>没有任何增长。</strong></p>
+</blockquote>
+
+<hr />
+
+<h1 id="然后进行真正的功能验证">然后进行真正的功能验证</h1>
+
+<h3 id="binder-1">Binder</h3>
+
+<p>恢复：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>binder
+binder-control
+hwbinder
+vndbinder
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">am</code> get-current-user：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="pty-1">PTY</h3>
+
+<p>测试：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>pty.openpty()
+→ PTY_OK
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>不再出现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>out of pty devices
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="ssh">SSH</h3>
+
+<p>最终真的建立：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/dev/pts/0
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>交互式 SSH 会话成功。</p>
+
+<h3 id="服务">服务</h3>
+
+<p>同时：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>nginx       → HTTP 200
+OpenList    → HTTP 200
+qBittorrent → HTTP 200
+Tailscale   → Online
+frpc        → 正常
+cloudflared → 正常
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>至此，才真正可以说：</p>
+
+<blockquote>
+  <p>修复完成。</p>
+</blockquote>
+
+<hr />
+
+<h1 id="还有一个很有意思的后续frpc-到底是不是双实例故障">还有一个很有意思的后续：frpc 到底是不是”双实例故障”？</h1>
+
+<p>稳定性审计过程中，又发现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>frpc PID 7732
+frpc PID 9005
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>第一反应很容易是：</p>
+
+<blockquote>
+  <p>“怎么又启动两份了？”</p>
+</blockquote>
+
+<p>结果只读检查后才发现：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>7732
+→ SSH tunnel
+
+9005
+→ OpenList tunnel
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>它们：</p>
+
+<ul>
+  <li>PID 不同</li>
+  <li>PPID 都是 1</li>
+  <li>配置来源不同</li>
+  <li>日志不同</li>
+  <li>各自只负责一个 tunnel</li>
+</ul>
+
+<p>而 <code class="language-plaintext highlighter-rouge">frpc.sh</code> 本身就明确写着：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>INSTANCES="ssh openlist"
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>所以这里的结论恰恰是：</p>
+
+<blockquote>
+  <p><strong>两个 frpc 进程不是异常，而是设计如此。</strong></p>
+</blockquote>
+
+<p>这又是一次很典型的”不能只看数量判断系统是否异常”。</p>
+
+<hr />
+
+<h1 id="最终系统状态">最终系统状态</h1>
+
+<p>经过完整审计之后，当前系统已经运行了超过 20 小时，核心状态稳定。</p>
+
+<p>整个系统大概变成这样：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="rouge-code"><pre>                    Android
+                       │
+               ┌───────┴───────┐
+               │               │
+          Magisk boot       Android 服务
+               │
+         chroot mount
+               │
+        ┌──────┴──────┐
+        │             │
+     private       宿主 shared
+        │             │
+     Ubuntu        Android
+        │
+   ┌────┼──────────────┐
+   │    │              │
+ sshd  services      cron
+   │    │
+   │    ├─ nginx
+   │    ├─ OpenList
+   │    ├─ qBittorrent
+   │    ├─ frpc ×2
+   │    └─ cloudflared
+   │
+   └── 外部 SSH
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>而 mount 层则保持：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre>宿主：
+/dev      41
+/dev/pts  42
+/proc     43
+/sys      44
+
+chroot：
+/dev      private
+/dev/pts  private
+/proc     private
+/sys      private
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>没有继续产生覆盖层。</p>
+
+<hr />
+
+<h1 id="这次故障最值得记住的几个教训">这次故障最值得记住的几个教训</h1>
+
+<h2 id="1-chroot--mount-namespace-隔离">1. chroot ≠ mount namespace 隔离</h2>
+
+<p>这是整次事件最大的教训。</p>
+
+<p>很多人看到：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>chroot
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>就会下意识认为”容器里的 mount 不会影响外面”。</p>
+
+<p>实际上不是。</p>
+
+<p>如果 mount namespace 没有隔离，传播机制依然可能把你的操作带回宿主。</p>
+
+<hr />
+
+<h2 id="2-静态代码看不懂-mount-propagation">2. 静态代码看不懂 mount propagation</h2>
+
+<p>单纯搜索：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>mount -o bind
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>很难发现真正的问题。</p>
+
+<p>因为：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>mount -o bind /dev "/dev"
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>从语法上完全正常。</p>
+
+<p>真正的问题是：</p>
+
+<blockquote>
+  <p><strong>这个目标 mount 是 shared 还是 private？</strong></p>
+</blockquote>
+
+<p>这属于运行时内核语义，而不是字符串层面的 bug。</p>
+
+<hr />
+
+<h2 id="3-不要把端口开着当成服务健康">3. 不要把”端口开着”当成服务健康</h2>
+
+<p>35930 当时确实是 UP。</p>
+
+<p>但：</p>
+
+<blockquote>
+  <p>35930 属于 tailscaled。</p>
+</blockquote>
+
+<p>所以：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>端口 UP ≠ OpenList 正常
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>正确做法应该是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>HTTP 200
+实际 API 响应
+真实 SSH 登录
+真实 PTY
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="4-备份文件绝对不要放进自动执行目录">4. 备份文件绝对不要放进自动执行目录</h2>
+
+<p>这一点几乎可以写进每一个 Magisk 脚本项目的 README：</p>
+
+<blockquote>
+  <p><strong>service.d 不是普通文件夹。</strong></p>
+</blockquote>
+
+<p>一个：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>99-chroot-boot.sh.bak
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>如果还带着：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>0755
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>那它就不再是备份。</p>
+
+<p>它是：</p>
+
+<blockquote>
+  <p><strong>另一个启动脚本。</strong></p>
+</blockquote>
+
+<hr />
+
+<h2 id="5-满盘问题经常比真正的-bug-更危险">5. 满盘问题经常比真正的 bug 更危险</h2>
+
+<p>这次排查过程中还出现过：</p>
+
+<ul>
+  <li>脚本被写成全 \0</li>
+  <li>服务启动失败</li>
+  <li>下载任务刚加就失败</li>
+  <li>开机异常</li>
+</ul>
+
+<p>后来发现 /data 曾经一度接近甚至达到 100%。</p>
+
+<p>所以我越来越觉得：</p>
+
+<blockquote>
+  <p><strong>磁盘空间应该和 CPU、内存一样，属于基础健康指标。</strong></p>
+</blockquote>
+
+<hr />
+
+<h1 id="最后的回顾">最后的回顾</h1>
+
+<p>现在再回头看整件事情，会发现最有意思的地方是：</p>
+
+<p>我最初只是想解决：</p>
+
+<blockquote>
+  <p>“为什么我的公网 IPv6 从外面访问不了？”</p>
+</blockquote>
+
+<p>真正走到最后，却变成了：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="rouge-code"><pre>IPv6
+ ↓
+光猫
+ ↓
+Cloudflare / OpenFRP
+ ↓
+Android 自启动
+ ↓
+chroot
+ ↓
+/proc
+ ↓
+/dev
+ ↓
+mount propagation
+ ↓
+Binder
+ ↓
+devpts
+ ↓
+PTY
+ ↓
+SSH
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>最后真正解决问题的代码，甚至没有多少。</p>
+
+<p>但这也是系统排障最有意思的地方之一：</p>
+
+<blockquote>
+  <p><strong>真正困难的，从来不是最后写出那几行代码，而是确定那几行代码为什么必须存在。</strong></p>
+</blockquote>
+
+<p>从”OpenList 又炸了”，到发现 /dev/binder 消失；从 SSH banner 后断开，到发现根本没有 PTY；从 mount ID 不断增长，到最终定位 shared propagation。</p>
+
+<p>每一个看似独立的问题，最后其实都是同一条因果链上的不同表现。</p>
+
+<p>而现在，这台原本只是”拿来折腾”的 Android 手机，已经真正变成了一台跑着 Ubuntu chroot、反向隧道、Web 服务、SSH、定时任务和自动证书续期的小型家庭服务器。</p>
+
+<p>这次故障算是正式结案。</p>
+
+<blockquote>
+  <p>有时候，最深的 bug，藏在最普通的一行 mount -o bind 后面。</p>
+</blockquote>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2026/09/12/incomplete-projects/" data-toggle="tooltip" data-placement="top" title="我做过很多没有做完的项目">
+                        Previous<br>
+                        <span>我做过很多没有做完的项目</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2026/10/18/android-kvm-windows11-xaga/" data-toggle="tooltip" data-placement="top" title="给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程">
+                        Next<br>
+                        <span>给天玑 8100 开 KVM：一次把 Windows 11 ARM64 塞进 Android 的过程</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+        
+                <a data-sort="0004" 
+                    href="/archive/?tag=Android"
+                    title="Android"
+                    rel="8">Android</a>
+        
+                <a data-sort="0008" 
+                    href="/archive/?tag=QEMU"
+                    title="QEMU"
+                    rel="4">QEMU</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E6%95%99%E7%A8%8B"
+                    title="教程"
+                    rel="3">教程</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=%E8%99%9A%E6%8B%9F%E6%9C%BA"
+                    title="虚拟机"
+                    rel="3">虚拟机</a>
+        
+                <a data-sort="0009" 
+                    href="/archive/?tag=Windows"
+                    title="Windows"
+                    rel="3">Windows</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=APQ"
+                    title="APQ"
+                    rel="2">APQ</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=KVM"
+                    title="KVM"
+                    rel="2">KVM</a>
+        
+                <a data-sort="0010" 
+                    href="/archive/?tag=MTK"
+                    title="MTK"
+                    rel="2">MTK</a>
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  <li>
+    <a href="https://twitter.com/citie6666">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+  
+  
+  
+  <li>
+    <a target="_blank" href="https://github.com/citie114514">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; 磁贴のblog 2026
+                    <br>
+                    Powered by <a href="https://jekyllrb.com">Jekyll</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
